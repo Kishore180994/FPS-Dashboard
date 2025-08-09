@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hotlist Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      button {
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #357abd;
+      }
+      .hotlist-item {
+        background: #3a3a3a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border-left: 4px solid #4a90e2;
+      }
+      .hotlist-name {
+        font-weight: bold;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+      }
+      .hotlist-description {
+        color: #ccc;
+        font-size: 0.9em;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        background: #1a1a1a;
+        border: 1px solid #555;
+        color: white;
+        border-radius: 4px;
+      }
+      .success {
+        color: #4caf50;
+      }
+      .error {
+        color: #f44336;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏷️ Hotlist Functionality Test</h1>
+
+    <div class="test-section">
+      <h2>Create New Hotlist</h2>
+      <input type="text" id="hotlistName" placeholder="Hotlist Name" />
+      <textarea
+        id="hotlistDescription"
+        placeholder="Hotlist Description"
+        rows="3"
+      ></textarea>
+      <button onclick="createHotlist()">Create Hotlist</button>
+      <div id="createResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Existing Hotlists</h2>
+      <button onclick="loadHotlists()">Refresh Hotlists</button>
+      <div id="hotlistsList"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test Data</h2>
+      <button onclick="addTestRun()">Add Test Run</button>
+      <button onclick="assignHotlistToRun()">Assign Hotlist to Last Run</button>
+      <div id="testResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Filter by Hotlist</h2>
+      <select id="hotlistFilter">
+        <option value="">Select a hotlist to filter</option>
+      </select>
+      <button onclick="filterByHotlist()">Filter Runs</button>
+      <div id="filterResult"></div>
+    </div>
+
+    <script type="module">
+      import * as HotlistManager from "./js/hotlist-manager.js";
+
+      // Initialize hotlists
+      HotlistManager.initializeHotlists();
+
+      // Make functions globally available
+      window.createHotlist = function () {
+        const name = document.getElementById("hotlistName").value.trim();
+        const description = document
+          .getElementById("hotlistDescription")
+          .value.trim();
+        const resultDiv = document.getElementById("createResult");
+
+        if (!name) {
+          resultDiv.innerHTML =
+            '<p class="error">Please enter a hotlist name</p>';
+          return;
+        }
+
+        try {
+          const hotlist = HotlistManager.createHotlist(name, description);
+          resultDiv.innerHTML = `<p class="success">Created hotlist: ${hotlist.name} (ID: ${hotlist.id})</p>`;
+          document.getElementById("hotlistName").value = "";
+          document.getElementById("hotlistDescription").value = "";
+          loadHotlists();
+          updateHotlistFilter();
+        } catch (error) {
+          resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+      };
+
+      window.loadHotlists = function () {
+        const hotlists = HotlistManager.getAllHotlists();
+        const listDiv = document.getElementById("hotlistsList");
+
+        if (hotlists.length === 0) {
+          listDiv.innerHTML = "<p>No hotlists created yet.</p>";
+          return;
+        }
+
+        let html = "";
+        hotlists.forEach((hotlist) => {
+          html += `
+                    <div class="hotlist-item">
+                        <div class="hotlist-name">${hotlist.name}</div>
+                        <div class="hotlist-description">${
+                          hotlist.description || "No description"
+                        }</div>
+                        <small>ID: ${hotlist.id} | Created: ${new Date(
+            hotlist.createdAt
+          ).toLocaleString()}</small>
+                        <button onclick="deleteHotlist('${
+                          hotlist.id
+                        }')" style="background: #f44336; margin-left: 10px;">Delete</button>
+                    </div>
+                `;
+        });
+        listDiv.innerHTML = html;
+      };
+
+      window.deleteHotlist = function (hotlistId) {
+        try {
+          HotlistManager.deleteHotlist(hotlistId);
+          loadHotlists();
+          updateHotlistFilter();
+          document.getElementById("createResult").innerHTML =
+            '<p class="success">Hotlist deleted successfully</p>';
+        } catch (error) {
+          document.getElementById(
+            "createResult"
+          ).innerHTML = `<p class="error">Error deleting hotlist: ${error.message}</p>`;
+        }
+      };
+
+      window.addTestRun = function () {
+        // Create a mock run data
+        const testRun = {
+          id: Date.now(),
+          appName: "Test App " + Math.floor(Math.random() * 100),
+          packageName: "com.test.app" + Math.floor(Math.random() * 100),
+          deviceModel: "Test Device",
+          avgFPS: Math.floor(Math.random() * 60) + 30,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Store in localStorage for testing
+        let runs = JSON.parse(localStorage.getItem("testRuns") || "[]");
+        runs.push(testRun);
+        localStorage.setItem("testRuns", JSON.stringify(runs));
+
+        document.getElementById(
+          "testResult"
+        ).innerHTML = `<p class="success">Added test run: ${testRun.appName}</p>`;
+      };
+
+      window.assignHotlistToRun = function () {
+        const runs = JSON.parse(localStorage.getItem("testRuns") || "[]");
+        const hotlists = HotlistManager.getAllHotlists();
+
+        if (runs.length === 0) {
+          document.getElementById("testResult").innerHTML =
+            '<p class="error">No test runs available. Add a test run first.</p>';
+          return;
+        }
+
+        if (hotlists.length === 0) {
+          document.getElementById("testResult").innerHTML =
+            '<p class="error">No hotlists available. Create a hotlist first.</p>';
+          return;
+        }
+
+        const lastRun = runs[runs.length - 1];
+        const randomHotlist =
+          hotlists[Math.floor(Math.random() * hotlists.length)];
+
+        try {
+          HotlistManager.addRunToHotlist(randomHotlist.id, lastRun);
+          document.getElementById(
+            "testResult"
+          ).innerHTML = `<p class="success">Assigned "${lastRun.appName}" to hotlist "${randomHotlist.name}"</p>`;
+        } catch (error) {
+          document.getElementById(
+            "testResult"
+          ).innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+      };
+
+      window.filterByHotlist = function () {
+        const hotlistId = document.getElementById("hotlistFilter").value;
+        const resultDiv = document.getElementById("filterResult");
+
+        if (!hotlistId) {
+          resultDiv.innerHTML = '<p class="error">Please select a hotlist</p>';
+          return;
+        }
+
+        try {
+          const runs = HotlistManager.getRunsByHotlist(hotlistId);
+          const hotlist = HotlistManager.getHotlist(hotlistId);
+
+          if (runs.length === 0) {
+            resultDiv.innerHTML = `<p>No runs found for hotlist "${hotlist.name}"</p>`;
+            return;
+          }
+
+          let html = `<h3>Runs for "${hotlist.name}":</h3>`;
+          runs.forEach((run) => {
+            html += `
+                        <div style="background: #3a3a3a; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            <strong>${run.appName}</strong> (${run.packageName})<br>
+                            Device: ${run.deviceModel} | FPS: ${run.avgFPS}
+                        </div>
+                    `;
+          });
+          resultDiv.innerHTML = html;
+        } catch (error) {
+          resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+      };
+
+      function updateHotlistFilter() {
+        const hotlists = HotlistManager.getAllHotlists();
+        const select = document.getElementById("hotlistFilter");
+
+        select.innerHTML =
+          '<option value="">Select a hotlist to filter</option>';
+        hotlists.forEach((hotlist) => {
+          const option = document.createElement("option");
+          option.value = hotlist.id;
+          option.textContent = hotlist.name;
+          select.appendChild(option);
+        });
+      }
+
+      // Load initial data
+      loadHotlists();
+      updateHotlistFilter();
+    </script>
+  </body>
+</html>

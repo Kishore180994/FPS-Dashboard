@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Name Formatting Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+      }
+      .test-case {
+        background: #2a2a2a;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border-left: 4px solid #4caf50;
+      }
+      .input {
+        color: #ffeb3b;
+        font-weight: bold;
+      }
+      .output {
+        color: #4caf50;
+        font-weight: bold;
+      }
+      h1 {
+        color: #4caf50;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>File Name Formatting Test</h1>
+    <div id="testResults"></div>
+
+    <script type="module">
+      import { formatFileNameToAppName } from "./js/utils.js";
+
+      const testCases = [
+        // Snake case
+        "abc_xyz.txt",
+        "my_game_fps_test.log",
+        "pubg_mobile_performance.txt",
+        "clash_of_clans_data.csv",
+
+        // Camel case
+        "angryBirdsPerformance.json",
+        "clashOfClans.txt",
+        "pubgMobile.log",
+        "myGameTest.csv",
+
+        // Kebab case
+        "angry-birds-test.txt",
+        "clash-of-clans-data.log",
+        "my-fps-test.json",
+
+        // Pascal case
+        "AngryBirdsTest.txt",
+        "ClashOfClans.log",
+        "PubgMobile.json",
+
+        // Mixed cases
+        "FPS_test_data.txt",
+        "GPU_benchmark_results.log",
+        "my_AI_test.json",
+        "VR_game_performance.csv",
+
+        // Single words
+        "minecraft.txt",
+        "fortnite.log",
+        "roblox.json",
+
+        // With numbers
+        "game_test_v2.txt",
+        "fps_data_2024.log",
+        "benchmark_v1_2.json",
+
+        // Edge cases
+        "test.txt",
+        "a.log",
+        "ALLCAPS.txt",
+        "lowercase.json",
+      ];
+
+      const resultsDiv = document.getElementById("testResults");
+
+      testCases.forEach((testCase) => {
+        const formatted = formatFileNameToAppName(testCase);
+        const testDiv = document.createElement("div");
+        testDiv.className = "test-case";
+        testDiv.innerHTML = `
+                <div>Input: <span class="input">${testCase}</span></div>
+                <div>Output: <span class="output">${formatted}</span></div>
+            `;
+        resultsDiv.appendChild(testDiv);
+      });
+    </script>
+  </body>
+</html>
