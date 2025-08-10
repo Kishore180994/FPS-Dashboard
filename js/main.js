@@ -10,6 +10,7 @@ import {
 } from "./ui-manager.js";
 import { initializeSidebar } from "./sidebar.js";
 import * as HotlistManager from "./hotlist-manager.js";
+import { initializeEnhancedHotlistUI } from "./hotlist-ui-redesign.js";
 
 // A global variable to hold the main dashboard instance.
 let dashboard;
@@ -37,6 +38,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize hotlists from localStorage
   HotlistManager.initializeHotlists();
+
+  // Initialize enhanced hotlist UI
+  initializeEnhancedHotlistUI();
 
   // 4. Expose certain UI or utility functions globally if they are called directly
   //    from inline HTML handlers and are not methods of the dashboard object.

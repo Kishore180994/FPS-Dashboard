@@ -7,6 +7,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="css/hotlist-enhanced.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
@@ -1941,6 +1942,14 @@
             <div class="nav-description">Manage and filter by hotlists</div>
           </div>
         </button>
+
+        <button class="nav-item" id="navFirebase" data-view="firebase">
+          <span class="nav-icon">🔥</span>
+          <div>
+            <div class="nav-text">Firebase</div>
+            <div class="nav-description">Cloud storage & sync settings</div>
+          </div>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -1951,11 +1960,32 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
       <div class="container">
-      <!-- Header -->
-      <div class="header">
-        <h1>FPS Data Dashboard</h1>
-        <!-- <p>Upload and analyze performance dump files</p> -->
-        <!-- <div class="demo-badge">Demo Version</div> -->
+      <!-- Dynamic Header -->
+      <div class="header" style="text-align: left; margin-bottom: 30px; padding: 15px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-left: 80px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="currentTabIcon" style="font-size: 1.5rem;">📊</span>
+            <h1 id="currentTabTitle" style="
+              font-size: 1.8rem;
+              font-weight: 600;
+              margin: 0;
+              color: var(--text-primary);
+              letter-spacing: 0.3px;
+            ">Input & Analysis</h1>
+          </div>
+          <div style="
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          ">
+            <span id="currentTabDescription" style="
+              color: var(--text-secondary);
+              font-size: 0.85rem;
+              font-weight: 500;
+            ">Upload files & view results</span>
+          </div>
+        </div>
       </div>
 
       <!-- Upload Section -->
@@ -2235,124 +2265,20 @@
 
       <!-- All Games Section -->
       <div class="dashboard-section" id="allGamesSection" style="display: none">
-        <div class="analysis-header">
-          <h2>🎮 Gaming Performance Analysis</h2>
-          <div class="view-controls">
-            <span id="gamesResultsCount" class="results-count">Loading games...</span>
-          </div>
-        </div>
-
-        <!-- Games Search and Filter Section -->
-        <div class="search-filter-section">
-          <div class="search-bar">
-            <input
-              type="text"
-              id="gamesSearchInput"
-              placeholder="Search games by name, genre, or package..."
-            />
-            <button id="clearGamesSearchBtn" class="clear-search-btn">Clear</button>
-          </div>
-          <div class="filter-chips" id="gamesFilterChips">
-            <!-- Filter chips will be populated by JavaScript -->
-          </div>
-        </div>
-
-        <!-- Games Stats -->
-        <div class="stats" id="gamesStatsContainer">
-          <div class="stat-item">
-            <div class="stat-value" id="totalGames">0</div>
-            <div class="stat-label">Total Games</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="avgGamesFps">0</div>
-            <div class="stat-label">Avg Game FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="bestGameFps">0</div>
-            <div class="stat-label">Best Game FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="worstGameFps">0</div>
-            <div class="stat-label">Worst Game FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="gameGenres">0</div>
-            <div class="stat-label">Game Categories</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="gamesDevices">0</div>
-            <div class="stat-label">Devices Tested</div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <div id="gamesTableContent">
-            <div class="empty-state">
-              <h3>No gaming data available</h3>
-              <p>Upload gaming performance data to see analysis here.</p>
-            </div>
+        <div id="allGamesContent">
+          <div class="empty-state">
+            <h3>No games data available</h3>
+            <p>Upload performance data to see game analysis here.</p>
           </div>
         </div>
       </div>
 
       <!-- All Devices Section -->
       <div class="dashboard-section" id="allDevicesSection" style="display: none">
-        <div class="analysis-header">
-          <h2>📱 Device Performance Analysis</h2>
-          <div class="view-controls">
-            <span id="devicesResultsCount" class="results-count">Loading devices...</span>
-          </div>
-        </div>
-
-        <!-- Devices Search and Filter Section -->
-        <div class="search-filter-section">
-          <div class="search-bar">
-            <input
-              type="text"
-              id="devicesSearchInput"
-              placeholder="Search by device manufacturer, model, or SoC..."
-            />
-            <button id="clearDevicesSearchBtn" class="clear-search-btn">Clear</button>
-          </div>
-          <div class="filter-chips" id="devicesFilterChips">
-            <!-- Filter chips will be populated by JavaScript -->
-          </div>
-        </div>
-
-        <!-- Devices Stats -->
-        <div class="stats" id="devicesStatsContainer">
-          <div class="stat-item">
-            <div class="stat-value" id="totalDevices">0</div>
-            <div class="stat-label">Unique Devices</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="avgDevicesFps">0</div>
-            <div class="stat-label">Avg Device FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="bestDeviceFps">0</div>
-            <div class="stat-label">Best Device FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="worstDeviceFps">0</div>
-            <div class="stat-label">Worst Device FPS</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="deviceBrands">0</div>
-            <div class="stat-label">Device Brands</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="socModels">0</div>
-            <div class="stat-label">SoC Models</div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <div id="devicesTableContent">
-            <div class="empty-state">
-              <h3>No device data available</h3>
-              <p>Upload performance data to see device analysis here.</p>
-            </div>
+        <div id="allDevicesContent">
+          <div class="empty-state">
+            <h3>No device data available</h3>
+            <p>Upload performance data to see device analysis here.</p>
           </div>
         </div>
       </div>
@@ -2495,53 +2421,80 @@
         </div>
       </div>
 
-      <!-- Hotlists Section -->
+      <!-- Enhanced Hotlists Section -->
       <div class="dashboard-section" id="hotlistsSection" style="display: none">
         <div class="analysis-header">
-          <h2>🏷️ Hotlist Management</h2>
+          <h2>🏷️ Enhanced Hotlist Management</h2>
           <div class="view-controls">
-            <button id="createHotlistBtn" class="btn btn-secondary">Create New Hotlist</button>
-            <span id="hotlistsResultsCount" class="results-count">Manage your hotlists</span>
+            <button id="quickCreateHotlistBtn" class="enhanced-btn enhanced-btn-primary">
+              <span class="btn-icon">➕</span>
+              Create Hotlist
+            </button>
+            <span id="hotlistsResultsCount" class="results-count">Manage your hotlists with enhanced features</span>
           </div>
         </div>
 
-        <!-- Hotlist Creation Section -->
-        <div class="search-filter-section" id="hotlistCreationSection" style="display: none;">
-          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Create New Hotlist</h3>
-          <div style="display: grid; gap: 15px; margin-bottom: 20px;">
-            <div>
-              <label style="display: block; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">Hotlist Name:</label>
-              <input type="text" id="hotlistNameInput" placeholder="Enter hotlist name (e.g., High Performance Games)"
-                     style="width: 100%; padding: 10px 15px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; box-sizing: border-box;" />
-            </div>
-            <div>
-              <label style="display: block; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">Description:</label>
-              <textarea id="hotlistDescriptionInput" placeholder="Enter description for this hotlist"
-                        style="width: 100%; padding: 10px 15px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; min-height: 80px; resize: vertical; box-sizing: border-box;"></textarea>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-              <button id="cancelHotlistBtn" class="clear-search-btn">Cancel</button>
-              <button id="saveHotlistBtn" class="upload-btn">Save Hotlist</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Existing Hotlists -->
+        <!-- Enhanced Hotlist Controls -->
         <div class="search-filter-section">
-          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Existing Hotlists</h3>
-          <div id="hotlistsContainer">
-            <div class="empty-state">
-              <h3>No hotlists created yet</h3>
-              <p>Create your first hotlist to organize and filter your performance runs.</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+            <!-- Search and Sort Controls -->
+            <div style="display: flex; gap: 10px; flex: 1; min-width: 300px;">
+              <input type="text" id="hotlistSearchInput" placeholder="Search hotlists by name or description..."
+                     style="flex: 1; padding: 10px 15px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif;" />
+              <select id="hotlistSortSelect" 
+                      style="padding: 10px 15px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; min-width: 150px;">
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="created-desc">Newest First</option>
+                <option value="created-asc">Oldest First</option>
+                <option value="runs-desc">Most Runs</option>
+                <option value="runs-asc">Least Runs</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Bulk Actions (Hidden by default) -->
+          <div id="hotlistBulkActions" style="display: none; background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary-color); border-radius: var(--btn-radius); padding: 15px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <span id="selectedHotlistsCount" style="color: var(--text-primary); font-weight: 600;">0 hotlists selected</span>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="selectAllHotlistsBtn" class="enhanced-btn enhanced-btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+                  Select All
+                </button>
+                <button id="exportSelectedHotlistsBtn" class="enhanced-btn enhanced-btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+                  <span class="btn-icon">📤</span> Export
+                </button>
+                <button id="deleteSelectedHotlistsBtn" class="enhanced-btn" style="background: var(--error-color); color: white; padding: 8px 16px; font-size: 0.85rem;">
+                  <span class="btn-icon">🗑️</span> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Hotlists Container -->
+        <div id="enhancedHotlistsContainer">
+          <div class="enhanced-empty-state">
+            <div class="empty-state-icon">🏷️</div>
+            <h3 class="empty-state-title">No Hotlists Found</h3>
+            <p class="empty-state-description">
+              Create your first hotlist to organize and filter your performance runs
+            </p>
+            <div class="empty-state-actions">
+              <button class="enhanced-btn enhanced-btn-primary" onclick="showQuickCreateModal()">
+                <span class="btn-icon">➕</span>
+                Create First Hotlist
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Runs with Hotlists -->
-        <div class="search-filter-section">
+        <div class="search-filter-section" style="margin-top: 40px;">
           <h3 style="color: var(--text-primary); margin-bottom: 15px;">Filter by Hotlist</h3>
           <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;" id="hotlistFilterButtons">
-            <button class="btn btn-secondary" onclick="window.dashboard.clearHotlistFilter()">Show All</button>
+            <button class="enhanced-btn enhanced-btn-secondary" onclick="window.dashboard.clearHotlistFilter()">Show All</button>
           </div>
           <div class="table-container">
             <div id="hotlistRunsTableContent">
@@ -2549,6 +2502,119 @@
                 <h3>No runs available</h3>
                 <p>Upload performance data and assign hotlists to see filtered results here.</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Firebase Section -->
+      <div class="dashboard-section" id="firebaseSection" style="display: none">
+        <div class="analysis-header">
+          <h2>🔥 Firebase Cloud Storage</h2>
+          <div class="view-controls">
+            <button id="syncFirebaseBtn" class="btn btn-secondary">Sync Now</button>
+            <span id="firebaseResultsCount" class="results-count">Cloud storage management</span>
+          </div>
+        </div>
+
+        <!-- Firebase Status Section -->
+        <div class="search-filter-section">
+          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Connection Status</h3>
+          <div class="stats" style="margin: 0;">
+            <div class="stat-item">
+              <div class="stat-value" id="firebaseConnectionStatus">🔴</div>
+              <div class="stat-label">Connection</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="firebaseAutoSaveStatus">❌</div>
+              <div class="stat-label">Auto-Save</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="firebaseLocalDataCount">0</div>
+              <div class="stat-label">Local Records</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="firebaseSyncedCount">0</div>
+              <div class="stat-label">Synced Records</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="firebaseLastSync">Never</div>
+              <div class="stat-label">Last Sync</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Firebase Controls Section -->
+        <div class="search-filter-section">
+          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Cloud Storage Controls</h3>
+          <div style="display: grid; gap: 15px;">
+            <!-- Auto-save Toggle -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <div>
+                <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;">Auto-Save to Firebase</div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">Automatically save new uploads to cloud storage</div>
+              </div>
+              <button id="toggleAutoSaveBtn" class="upload-btn" style="min-width: 100px;">Enable</button>
+            </div>
+
+            <!-- Manual Sync -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <div>
+                <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;">Manual Sync</div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">Sync local data with Firebase and load latest from cloud</div>
+              </div>
+              <button id="manualSyncBtn" class="btn btn-secondary" style="min-width: 100px;">Sync Now</button>
+            </div>
+
+            <!-- Load from Firebase -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <div>
+                <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;">Load from Cloud</div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">Replace local data with latest from Firebase</div>
+              </div>
+              <button id="loadFromFirebaseBtn" class="btn btn-secondary" style="min-width: 100px;">Load Data</button>
+            </div>
+
+            <!-- Clear Local Data -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <div>
+                <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;">Clear Local Data</div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">Remove all local data (Firebase data remains safe)</div>
+              </div>
+              <button id="clearLocalDataBtn" class="clear-btn" style="min-width: 100px;">Clear Local</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Firebase Data Management -->
+        <div class="search-filter-section">
+          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Cloud Data Management</h3>
+          <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            <button id="refreshFirebaseDataBtn" class="btn btn-secondary">Refresh Status</button>
+            <button id="exportFirebaseDataBtn" class="btn btn-secondary">Export Cloud Data</button>
+            <button id="viewFirebaseLogsBtn" class="btn btn-secondary">View Sync Logs</button>
+          </div>
+          
+          <!-- Firebase Data Table -->
+          <div class="table-container">
+            <div id="firebaseDataTableContent">
+              <div class="empty-state">
+                <h3>No cloud data available</h3>
+                <p>Upload data or sync with Firebase to see cloud storage contents here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Firebase Configuration -->
+        <div class="search-filter-section">
+          <h3 style="color: var(--text-primary); margin-bottom: 15px;">Configuration</h3>
+          <div style="background: rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <div style="display: grid; gap: 10px; font-family: 'Roboto Mono', monospace; font-size: 0.8rem; color: var(--text-secondary);">
+              <div><strong>Project ID:</strong> fps-dashboard</div>
+              <div><strong>Auth Domain:</strong> fps-dashboard.firebaseapp.com</div>
+              <div><strong>Storage Bucket:</strong> fps-dashboard.firebasestorage.app</div>
+              <div><strong>Collections:</strong> fps_data, hotlists, user_sessions</div>
             </div>
           </div>
         </div>

@@ -1,5 +1,57 @@
 // Sidebar and Navigation Module
 
+// Dynamic Header Configuration
+const headerConfig = {
+  "input-analysis": {
+    icon: "📊",
+    title: "Input & Analysis",
+    description: "Upload files & view results",
+  },
+  dashboard: {
+    icon: "📈",
+    title: "Dashboard",
+    description: "Performance charts & stats",
+  },
+  games: {
+    icon: "🎮",
+    title: "All Games",
+    description: "Complete game performance data",
+  },
+  devices: {
+    icon: "📱",
+    title: "All Devices",
+    description: "Device performance overview",
+  },
+  charts: {
+    icon: "📊",
+    title: "Charts Section",
+    description: "App-specific performance charts",
+  },
+  hotlists: {
+    icon: "🏷️",
+    title: "Hotlists",
+    description: "Manage and filter by hotlists",
+  },
+  firebase: {
+    icon: "🔥",
+    title: "Firebase",
+    description: "Cloud storage & sync settings",
+  },
+};
+
+// Function to update the dynamic header
+function updateDynamicHeader(view) {
+  const config = headerConfig[view] || headerConfig["input-analysis"];
+
+  const iconElement = document.getElementById("currentTabIcon");
+  const titleElement = document.getElementById("currentTabTitle");
+  const descriptionElement = document.getElementById("currentTabDescription");
+
+  if (iconElement) iconElement.textContent = config.icon;
+  if (titleElement) titleElement.textContent = config.title;
+  if (descriptionElement) descriptionElement.textContent = config.description;
+}
+
 // This function will be called once from main.js to set up all the sidebar event listeners.
 export function initializeSidebar() {
   const sidebarToggle = document.getElementById("sidebarToggle");
@@ -54,6 +106,9 @@ export function initializeSidebar() {
       // Update active state visuals
       navItems.forEach((nav) => nav.classList.remove("active"));
       item.classList.add("active");
+
+      // Update dynamic header
+      updateDynamicHeader(view);
 
       // Close sidebar on mobile after selecting a view
       if (window.innerWidth <= 768) {
@@ -154,6 +209,16 @@ function handleNavigation(view) {
       break;
     case "hotlists":
       showHotlistsView(
+        uploadSection,
+        statsSection,
+        performanceSection,
+        analysisSection,
+        chartsSection,
+        dashboard
+      );
+      break;
+    case "firebase":
+      showFirebaseView(
         uploadSection,
         statsSection,
         performanceSection,
@@ -371,4 +436,40 @@ function showHotlistsView(
   }
 
   dashboard.showToast("Switched to Hotlists view", "info");
+}
+
+function showFirebaseView(
+  uploadSection,
+  statsSection,
+  performanceSection,
+  analysisSection,
+  chartsSection,
+  dashboard
+) {
+  // Hide all original dashboard sections
+  if (uploadSection) uploadSection.style.display = "none";
+  if (statsSection) statsSection.style.display = "none";
+  if (performanceSection) performanceSection.style.display = "none";
+  if (analysisSection) analysisSection.style.display = "none";
+  if (chartsSection) chartsSection.style.display = "none";
+  document.getElementById("currentViewSection").style.display = "none";
+
+  // Hide other dedicated view sections
+  document.getElementById("allGamesSection").style.display = "none";
+  document.getElementById("allDevicesSection").style.display = "none";
+  document.getElementById("appChartsSection").style.display = "none";
+  document.getElementById("hotlistsSection").style.display = "none";
+
+  // Show the dedicated Firebase section
+  const firebaseSection = document.getElementById("firebaseSection");
+  if (firebaseSection) {
+    firebaseSection.style.display = "block";
+
+    // Import and call the UI update function
+    import("./ui-manager.js").then((UIManager) => {
+      UIManager.updateFirebaseView(dashboard);
+    });
+  }
+
+  dashboard.showToast("Switched to Firebase view", "info");
 }

@@ -4,6 +4,7 @@ import * as DataParser from "./data-parser.js";
 import * as UIManager from "./ui-manager.js";
 import * as ChartService from "./chart-service.js";
 import * as HotlistManager from "./hotlist-manager.js";
+import { firebaseService } from "./firebase-service.js";
 
 export class FPSDashboard {
   constructor() {
@@ -24,6 +25,11 @@ export class FPSDashboard {
     this.comparisonChartTimeScale = "1s";
     this.activeComparisonChart = "fps";
 
+    // Firebase integration
+    this.firebaseEnabled = true;
+    this.autoSaveToFirebase = true;
+    this.firebaseDataIds = new Map(); // Maps local data index to Firebase document ID
+
     // LDAP Authentication System
     this.adminUsers = [
       "danduri@google.com",
@@ -36,6 +42,7 @@ export class FPSDashboard {
     this.isAuthenticated = false;
 
     this.initializeEventListeners();
+    this.initializeFirebase();
   }
 
   initializeEventListeners() {
@@ -129,7 +136,14 @@ export class FPSDashboard {
           );
 
           if (parsedData) {
+            const dataIndex = this.uploadedData.length;
             this.uploadedData.push(parsedData);
+
+            // Auto-save to Firebase if enabled
+            if (this.autoSaveToFirebase) {
+              await this.saveDataToFirebase(parsedData, dataIndex);
+            }
+
             successCount++;
           } else {
             errorCount++;
@@ -426,6 +440,9 @@ export class FPSDashboard {
         return;
       }
 
+      // Delete from Firebase first
+      await this.deleteDataFromFirebase(dataIndex);
+
       this.uploadedData.splice(dataIndex, 1);
       this.selectedForComparison.delete(dataIndex);
 
@@ -610,5 +627,212 @@ export class FPSDashboard {
 
   updateFilterChips() {
     UIManager.updateFilterChips(this);
+  }
+
+  // Firebase Integration Methods
+
+  /**
+   * Initialize Firebase and load existing data
+   */
+  async initializeFirebase() {
+    if (!this.firebaseEnabled) return;
+
+    try {
+      console.log("Initializing Firebase integration...");
+
+      // Check if Firebase is connected
+      if (firebaseService.isConnected()) {
+        console.log("Firebase connected successfully");
+
+        // Load existing data from Firebase on startup
+        await this.loadDataFromFirebase();
+      } else {
+        console.warn("Firebase not connected");
+        this.firebaseEnabled = false;
+      }
+    } catch (error) {
+      console.error("Error initializing Firebase:", error);
+      this.firebaseEnabled = false;
+      this.showToast(
+        "Firebase initialization failed. Working in offline mode.",
+        "warning"
+      );
+    }
+  }
+
+  /**
+   * Save FPS data to Firebase
+   * @param {Object} fpsData - The FPS data to save
+   * @param {number} localIndex - Local array index for mapping
+   */
+  async saveDataToFirebase(fpsData, localIndex) {
+    if (!this.firebaseEnabled || !this.autoSaveToFirebase) return;
+
+    try {
+      const documentId = await firebaseService.saveFPSData(fpsData);
+      this.firebaseDataIds.set(localIndex, documentId);
+      console.log(`Data saved to Firebase with ID: ${documentId}`);
+    } catch (error) {
+      console.error("Error saving data to Firebase:", error);
+      this.showToast("Failed to save data to Firebase", "warning");
+    }
+  }
+
+  /**
+   * Load all data from Firebase
+   */
+  async loadDataFromFirebase() {
+    if (!this.firebaseEnabled) return;
+
+    try {
+      this.showLoading();
+      const firebaseData = await firebaseService.loadAllFPSData();
+
+      if (firebaseData.length > 0) {
+        // Clear existing data and load from Firebase
+        this.uploadedData = [];
+        this.firebaseDataIds.clear();
+
+        firebaseData.forEach((data, index) => {
+          // Remove Firebase-specific fields for local use
+          const {
+            id,
+            createdAt,
+            updatedAt,
+            hasRawData,
+            rawDataSize,
+            ...cleanData
+          } = data;
+
+          // Add to local data
+          this.uploadedData.push(cleanData);
+          this.firebaseDataIds.set(index, id);
+        });
+
+        this.updateDisplay();
+        this.showToast(
+          `Loaded ${firebaseData.length} records from Firebase`,
+          "success"
+        );
+        console.log(`Loaded ${firebaseData.length} records from Firebase`);
+      }
+    } catch (error) {
+      console.error("Error loading data from Firebase:", error);
+      this.showToast("Failed to load data from Firebase", "error");
+    } finally {
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Delete data from Firebase
+   * @param {number} localIndex - Local array index
+   */
+  async deleteDataFromFirebase(localIndex) {
+    if (!this.firebaseEnabled) return;
+
+    const documentId = this.firebaseDataIds.get(localIndex);
+    if (!documentId) return;
+
+    try {
+      await firebaseService.deleteFPSData(documentId);
+      this.firebaseDataIds.delete(localIndex);
+      console.log(`Data deleted from Firebase with ID: ${documentId}`);
+    } catch (error) {
+      console.error("Error deleting data from Firebase:", error);
+      this.showToast("Failed to delete data from Firebase", "warning");
+    }
+  }
+
+  /**
+   * Update data in Firebase
+   * @param {number} localIndex - Local array index
+   * @param {Object} updateData - Data to update
+   */
+  async updateDataInFirebase(localIndex, updateData) {
+    if (!this.firebaseEnabled) return;
+
+    const documentId = this.firebaseDataIds.get(localIndex);
+    if (!documentId) return;
+
+    try {
+      await firebaseService.updateFPSData(documentId, updateData);
+      console.log(`Data updated in Firebase with ID: ${documentId}`);
+    } catch (error) {
+      console.error("Error updating data in Firebase:", error);
+      this.showToast("Failed to update data in Firebase", "warning");
+    }
+  }
+
+  /**
+   * Search data in Firebase by app name
+   * @param {string} appName - App name to search for
+   */
+  async searchFirebaseByApp(appName) {
+    if (!this.firebaseEnabled) return [];
+
+    try {
+      const results = await firebaseService.searchFPSDataByApp(appName);
+      return results;
+    } catch (error) {
+      console.error("Error searching Firebase:", error);
+      this.showToast("Failed to search Firebase", "error");
+      return [];
+    }
+  }
+
+  /**
+   * Toggle Firebase auto-save
+   */
+  toggleFirebaseAutoSave() {
+    this.autoSaveToFirebase = !this.autoSaveToFirebase;
+    this.showToast(
+      `Firebase auto-save ${this.autoSaveToFirebase ? "enabled" : "disabled"}`,
+      "info"
+    );
+  }
+
+  /**
+   * Manual sync with Firebase
+   */
+  async syncWithFirebase() {
+    if (!this.firebaseEnabled) {
+      this.showToast("Firebase is not enabled", "warning");
+      return;
+    }
+
+    try {
+      this.showLoading();
+
+      // Save any unsaved local data to Firebase
+      for (let i = 0; i < this.uploadedData.length; i++) {
+        if (!this.firebaseDataIds.has(i)) {
+          await this.saveDataToFirebase(this.uploadedData[i], i);
+        }
+      }
+
+      // Reload data from Firebase to get latest
+      await this.loadDataFromFirebase();
+
+      this.showToast("Successfully synced with Firebase", "success");
+    } catch (error) {
+      console.error("Error syncing with Firebase:", error);
+      this.showToast("Failed to sync with Firebase", "error");
+    } finally {
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Get Firebase connection status
+   */
+  getFirebaseStatus() {
+    return {
+      enabled: this.firebaseEnabled,
+      connected: firebaseService.isConnected(),
+      autoSave: this.autoSaveToFirebase,
+      localDataCount: this.uploadedData.length,
+      firebaseMappedCount: this.firebaseDataIds.size,
+    };
   }
 }

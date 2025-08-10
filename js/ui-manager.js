@@ -751,9 +751,22 @@ export function initializeDetailedAnalysis() {
 export function openDetailedAnalysis(data) {
   currentAnalysisData = data;
   const modal = document.getElementById("analysisModal");
-  document.getElementById("analysisModalTitle").textContent = `${
-    data.appName || "Unknown App"
-  } - Detailed Analysis`;
+
+  // Find the title element (it might be in the wrapper now)
+  let titleElement = document.getElementById("analysisModalTitle");
+  if (!titleElement) {
+    // If not found, look for it in the wrapper
+    const wrapper = document.getElementById("titleHotlistWrapper");
+    if (wrapper) {
+      titleElement = wrapper.querySelector("h2");
+    }
+  }
+
+  if (titleElement) {
+    titleElement.textContent = `${
+      data.appName || "Unknown App"
+    } - Detailed Analysis`;
+  }
 
   clearAIAnalysis();
   populateAppOverview(data);
@@ -967,114 +980,143 @@ function populateRunHotlists(data) {
 
   if (runIndex === -1) return;
 
-  // Get hotlists for this run
+  // Get hotlists for this run and all available hotlists
   const runHotlists = dashboard.getHotlistsForRun(runIndex);
+  const allHotlists = dashboard.getAllHotlists();
+  const assignedHotlistIds = runHotlists.map((h) => h.id);
 
-  // Find or create the hotlists section in the modal
-  let hotlistsSection = document.getElementById("runHotlistsSection");
+  // Sort unassigned hotlists by usage frequency (most used first)
+  const suggestedHotlists = allHotlists
+    .filter((h) => !assignedHotlistIds.includes(h.id))
+    .sort((a, b) => (b.runIds?.length || 0) - (a.runIds?.length || 0))
+    .slice(0, 5); // Show top 5 most used hotlists
 
-  if (!hotlistsSection) {
-    // Create the hotlists section if it doesn't exist
-    const appOverviewSection = document.querySelector(
-      "#analysisModal .analysis-section"
-    );
-    if (appOverviewSection) {
-      hotlistsSection = document.createElement("div");
-      hotlistsSection.id = "runHotlistsSection";
-      hotlistsSection.className = "analysis-section";
-      hotlistsSection.innerHTML = `
-        <h3 class="analysis-section-title">🏷️ Hotlists</h3>
-        <div id="runHotlistsContent"></div>
-      `;
-      appOverviewSection.parentNode.insertBefore(
-        hotlistsSection,
-        appOverviewSection.nextSibling
-      );
+  // Check if wrapper already exists (from openDetailedAnalysis)
+  let hotlistContainer = document.getElementById("runHotlistChips");
+
+  if (!hotlistContainer) {
+    // If no wrapper exists yet, we need to create the structure
+    const modalTitle = document.getElementById("analysisModalTitle");
+    if (!modalTitle) return;
+
+    // Create a wrapper div for title and hotlist with flex column
+    const wrapperDiv = document.createElement("div");
+    wrapperDiv.id = "titleHotlistWrapper";
+    wrapperDiv.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 60px);
+      margin-right: 60px;
+    `;
+
+    // Move the title into the wrapper
+    const titleClone = modalTitle.cloneNode(true);
+    const parentNode = modalTitle.parentNode;
+    if (parentNode) {
+      parentNode.insertBefore(wrapperDiv, modalTitle);
+      modalTitle.remove();
+      wrapperDiv.appendChild(titleClone);
     }
+
+    // Create the hotlist chips container
+    hotlistContainer = document.createElement("div");
+    hotlistContainer.id = "runHotlistChips";
+    hotlistContainer.style.cssText = `
+      margin: 8px 0 12px 0;
+      padding: 8px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.01);
+      width: 100%;
+    `;
+
+    // Add the hotlist container to the wrapper
+    wrapperDiv.appendChild(hotlistContainer);
   }
 
-  const contentDiv = document.getElementById("runHotlistsContent");
-  if (!contentDiv) return;
+  // Update the hotlist container content
+  let containerHtml = `
+    <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+      <!-- Plus button at the beginning -->
+      <button onclick="showHotlistSelectionPopup(${runIndex})" style="
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        color: var(--text-secondary);
+        padding: 3px 8px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.3s ease;
+      " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.color='var(--text-secondary)'">
+        ➕ Add
+      </button>
+  `;
 
-  if (runHotlists.length === 0) {
-    contentDiv.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 10px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
-        <span style="color: var(--text-secondary); font-size: 0.9rem;">No hotlists assigned to this run</span>
-        <button onclick="showHotlistAssignmentModal(${runIndex})" style="
-          background: var(--success-color);
-          color: white;
+  // Add assigned hotlists
+  runHotlists.forEach((hotlist) => {
+    containerHtml += `
+      <span style="
+        background: var(--primary-color);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      ">
+        ${hotlist.name}
+        <button onclick="removeHotlistFromRun('${hotlist.id}', ${runIndex})" style="
+          background: none;
           border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8rem;
-          font-weight: 600;
-          margin-left: auto;
-        ">
-          ➕ Add Hotlists
-        </button>
-      </div>
-    `;
-  } else {
-    let hotlistsHtml = `
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
-    `;
-
-    runHotlists.forEach((hotlist) => {
-      hotlistsHtml += `
-        <span style="
-          background: var(--primary-color);
           color: white;
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 0.8rem;
-          font-weight: 600;
-          display: inline-flex;
+          cursor: pointer;
+          font-weight: bold;
+          padding: 0;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          display: flex;
           align-items: center;
-          gap: 4px;
-        ">
-          🏷️ ${hotlist.name}
-          <button onclick="window.dashboard.removeRunFromHotlist('${hotlist.id}', ${runIndex}); populateRunHotlists(currentAnalysisData);" style="
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            padding: 0;
-            margin-left: 4px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-          " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='none'" title="Remove from hotlist">
-            ×
-          </button>
-        </span>
-      `;
-    });
-
-    hotlistsHtml += `
-        <button onclick="showHotlistAssignmentModal(${runIndex})" style="
-          background: var(--success-color);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8rem;
-          font-weight: 600;
-          margin-left: auto;
-        ">
-          ➕ Add More
+          justify-content: center;
+          font-size: 10px;
+          transition: all 0.2s ease;
+        " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='none'" title="Remove from hotlist">
+          ×
         </button>
-      </div>
+      </span>
     `;
+  });
 
-    contentDiv.innerHTML = hotlistsHtml;
-  }
+  // Add suggested hotlists (grayed out and clickable)
+  suggestedHotlists.forEach((hotlist) => {
+    containerHtml += `
+      <button onclick="addHotlistToRun('${hotlist.id}', ${runIndex})" style="
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--text-secondary);
+        padding: 3px 8px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-weight: 400;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.3s ease;
+      " onmouseover="this.style.background='rgba(255, 255, 255, 0.08)'; this.style.color='var(--text-primary)'; this.style.borderColor='var(--primary-color)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.03)'; this.style.color='var(--text-secondary)'; this.style.borderColor='rgba(255, 255, 255, 0.15)'" title="Click to add this hotlist">
+        ${hotlist.name}
+      </button>
+    `;
+  });
+
+  containerHtml += `</div>`;
+  hotlistContainer.innerHTML = containerHtml;
 }
 
 // --- AI Analysis UI ---
@@ -1868,7 +1910,7 @@ export function updateHotlistsView(dashboard) {
 }
 
 function updateHotlistsContainer(dashboard) {
-  const container = document.getElementById("hotlistsContainer");
+  const container = document.getElementById("enhancedHotlistsContainer");
   const hotlists = dashboard.getAllHotlists();
 
   if (hotlists.length === 0) {
@@ -1881,89 +1923,263 @@ function updateHotlistsContainer(dashboard) {
     return;
   }
 
-  let html = '<div style="display: grid; gap: 15px;">';
+  // Initialize pagination state if not exists
+  if (!dashboard.hotlistPagination) {
+    dashboard.hotlistPagination = {
+      currentPage: 1,
+      itemsPerPage: 50,
+      isLoading: false,
+      hasMore: true,
+    };
+  }
 
-  hotlists.forEach((hotlist) => {
+  const pagination = dashboard.hotlistPagination;
+  const totalItems = hotlists.length;
+  const startIndex = 0;
+  const endIndex = Math.min(
+    pagination.currentPage * pagination.itemsPerPage,
+    totalItems
+  );
+  const displayedHotlists = hotlists.slice(startIndex, endIndex);
+
+  pagination.hasMore = endIndex < totalItems;
+
+  // Add search functionality
+  let html = `
+    <div style="margin-bottom: 15px;">
+      <input type="text" id="hotlistSearchInput" placeholder="🔍 Search hotlists by name or description..." 
+             style="width: 100%; padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box;"
+             oninput="filterHotlistTable()" />
+    </div>
+    
+    <div id="hotlistTableContainer" style="max-height: 70vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+      <table class="dashboard-table" style="margin: 0;">
+        <thead style="position: sticky; top: 0; background: var(--card-bg); z-index: 10;">
+          <tr>
+            <th style="width: 40px; text-align: center;">
+              <input type="checkbox" id="selectAllHotlists" onchange="toggleAllHotlistsSelection(this.checked)" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+            </th>
+            <th style="width: 25%; min-width: 150px;">Name</th>
+            <th style="width: 35%; min-width: 200px;">Description</th>
+            <th style="width: 10%; text-align: center;">Runs</th>
+            <th style="width: 15%; text-align: center;">Created</th>
+            <th style="width: 15%; text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="hotlistTableBody">
+  `;
+
+  displayedHotlists.forEach((hotlist) => {
     const runCount = hotlist.runIds.length;
-    const createdDate = new Date(hotlist.createdAt).toLocaleDateString();
+    const createdDate = new Date(hotlist.createdAt).toLocaleDateString(
+      "en-US",
+      {
+        month: "short",
+        day: "numeric",
+        year: "2-digit",
+      }
+    );
 
     html += `
-      <div class="hotlist-card" style="
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-      " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-          <div>
-            <h4 style="color: var(--text-primary); margin: 0 0 5px 0; font-size: 1.1rem; font-weight: 600;">
-              🏷️ ${hotlist.name}
-            </h4>
-            <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; line-height: 1.4;">
-              ${hotlist.description || "No description provided"}
-            </p>
+      <tr class="hotlist-row" data-name="${hotlist.name.toLowerCase()}" data-description="${(
+      hotlist.description || ""
+    ).toLowerCase()}" style="cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.dashboard.setHotlistFilter('${
+      hotlist.id
+    }')">
+        <td onclick="event.stopPropagation();" style="text-align: center;">
+          <input type="checkbox" class="hotlist-checkbox" data-hotlist-id="${
+            hotlist.id
+          }" onchange="updateHotlistSelection()" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+        </td>
+        <td style="padding: 8px 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1rem;">🏷️</span>
+            <div>
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem; line-height: 1.2;">${
+                hotlist.name
+              }</div>
+            </div>
           </div>
-          <div style="display: flex; gap: 8px;">
+        </td>
+        <td style="padding: 8px 12px;">
+          <div style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.3; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${
+            hotlist.description || "No description provided"
+          }">
+            ${
+              hotlist.description ||
+              '<em style="color: var(--text-secondary); opacity: 0.7;">No description provided</em>'
+            }
+          </div>
+        </td>
+        <td style="text-align: center; padding: 8px 12px;">
+          <span style="background: var(--primary-color); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+            ${runCount}
+          </span>
+        </td>
+        <td style="text-align: center; padding: 8px 12px;">
+          <span style="color: var(--text-secondary); font-size: 0.8rem;">
+            ${createdDate}
+          </span>
+        </td>
+        <td onclick="event.stopPropagation();" style="text-align: center; padding: 8px 12px;">
+          <div style="display: flex; gap: 4px; justify-content: center;">
+            <button onclick="window.dashboard.setHotlistFilter('${
+              hotlist.id
+            }')" style="
+              background: var(--success-color);
+              color: white;
+              border: none;
+              padding: 4px 8px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 0.7rem;
+              font-weight: 600;
+              transition: all 0.2s ease;
+            " onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--success-color)'" title="Filter runs by this hotlist">
+              🔍
+            </button>
             <button onclick="editHotlist('${hotlist.id}')" style="
               background: var(--primary-color);
               color: white;
               border: none;
-              padding: 6px 10px;
+              padding: 4px 8px;
               border-radius: 4px;
               cursor: pointer;
-              font-size: 0.8rem;
+              font-size: 0.7rem;
               font-weight: 600;
               transition: all 0.2s ease;
-            " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
-              ✏️ Edit
+            " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'" title="Edit hotlist">
+              ✏️
             </button>
             <button onclick="deleteHotlistConfirm('${hotlist.id}')" style="
               background: var(--error-color);
               color: white;
               border: none;
-              padding: 6px 10px;
+              padding: 4px 8px;
               border-radius: 4px;
               cursor: pointer;
-              font-size: 0.8rem;
+              font-size: 0.7rem;
               font-weight: 600;
               transition: all 0.2s ease;
-            " onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--error-color)'">
-              🗑️ Delete
+            " onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--error-color)'" title="Delete hotlist">
+              🗑️
             </button>
           </div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-          <div style="display: flex; gap: 20px;">
-            <span style="color: var(--text-secondary); font-size: 0.8rem;">
-              <strong style="color: var(--accent-light);">${runCount}</strong> runs
-            </span>
-            <span style="color: var(--text-secondary); font-size: 0.8rem;">
-              Created: <strong>${createdDate}</strong>
-            </span>
-          </div>
-          <button onclick="window.dashboard.setHotlistFilter('${
-            hotlist.id
-          }')" style="
-            background: var(--success-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-          " onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--success-color)'">
-            🔍 Filter Runs
-          </button>
-        </div>
-      </div>
+        </td>
+      </tr>
     `;
   });
 
-  html += "</div>";
+  html += `
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Bulk Actions -->
+    <div id="hotlistBulkActions" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span id="selectedHotlistsCount" style="color: var(--text-secondary); font-size: 0.9rem;">0 hotlists selected</span>
+        <button onclick="bulkDeleteHotlists()" style="
+          background: var(--error-color);
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: 600;
+        ">
+          🗑️ Delete Selected
+        </button>
+        <button onclick="clearHotlistSelection()" style="
+          background: var(--secondary-color);
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: 600;
+        ">
+          Clear Selection
+        </button>
+      </div>
+    </div>
+    
+    <!-- Pagination Info -->
+    <div id="hotlistPaginationInfo" style="
+      margin-top: 15px; 
+      padding: 10px; 
+      text-align: center; 
+      color: var(--text-secondary); 
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    ">
+      Showing ${endIndex} of ${totalItems} hotlists
+      ${
+        pagination.hasMore
+          ? '<div style="margin-top: 5px; color: var(--primary-color);">Scroll down to load more...</div>'
+          : ""
+      }
+    </div>
+    
+    <div id="hotlistLoadingIndicator" style="
+      display: none;
+      text-align: center;
+      padding: 15px;
+      color: var(--primary-color);
+      font-size: 0.8rem;
+    ">
+      <div style="display: inline-block; width: 16px; height: 16px; border: 2px solid var(--primary-color); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 8px;"></div>
+      Loading more hotlists...
+    </div>
+  `;
+
   container.innerHTML = html;
+
+  // Set up infinite scroll on table container
+  setupHotlistInfiniteScroll(dashboard);
+}
+
+function setupHotlistInfiniteScroll(dashboard) {
+  const gridContainer = document.getElementById("hotlistsGrid");
+  if (!gridContainer || dashboard.hotlistScrollListenerAdded) return;
+
+  dashboard.hotlistScrollListenerAdded = true;
+
+  gridContainer.addEventListener("scroll", () => {
+    const { scrollTop, scrollHeight, clientHeight } = gridContainer;
+    const pagination = dashboard.hotlistPagination;
+
+    // Check if we're near the bottom (within 100px)
+    if (
+      scrollTop + clientHeight >= scrollHeight - 100 &&
+      pagination.hasMore &&
+      !pagination.isLoading
+    ) {
+      loadMoreHotlists(dashboard);
+    }
+  });
+}
+
+function loadMoreHotlists(dashboard) {
+  const pagination = dashboard.hotlistPagination;
+  const loadingIndicator = document.getElementById("hotlistLoadingIndicator");
+
+  if (pagination.isLoading || !pagination.hasMore) return;
+
+  pagination.isLoading = true;
+  if (loadingIndicator) loadingIndicator.style.display = "block";
+
+  // Simulate loading delay for smooth UX
+  setTimeout(() => {
+    pagination.currentPage++;
+    pagination.isLoading = false;
+    if (loadingIndicator) loadingIndicator.style.display = "none";
+
+    // Re-render with more items
+    updateHotlistsContainer(dashboard);
+  }, 300);
 }
 
 function updateHotlistFilterButtons(dashboard) {
@@ -2888,3 +3104,786 @@ function showHotlistAssignmentModal(runIndex) {
     document.body.removeChild(modal);
   };
 }
+
+// --- Firebase View ---
+
+export function updateFirebaseView(dashboard) {
+  // Update Firebase status indicators
+  updateFirebaseStatus(dashboard);
+
+  // Set up Firebase event listeners if not already done
+  setupFirebaseEventListeners(dashboard);
+
+  // Update Firebase data table
+  updateFirebaseDataTable(dashboard);
+}
+
+function updateFirebaseStatus(dashboard) {
+  const status = dashboard.getFirebaseStatus();
+
+  // Update connection status
+  const connectionStatus = document.getElementById("firebaseConnectionStatus");
+  if (connectionStatus) {
+    connectionStatus.textContent = status.connected ? "🟢" : "🔴";
+  }
+
+  // Update auto-save status
+  const autoSaveStatus = document.getElementById("firebaseAutoSaveStatus");
+  if (autoSaveStatus) {
+    autoSaveStatus.textContent = status.autoSave ? "✅" : "❌";
+  }
+
+  // Update data counts
+  const localDataCount = document.getElementById("firebaseLocalDataCount");
+  if (localDataCount) {
+    localDataCount.textContent = status.localDataCount;
+  }
+
+  const syncedCount = document.getElementById("firebaseSyncedCount");
+  if (syncedCount) {
+    syncedCount.textContent = status.firebaseMappedCount;
+  }
+
+  // Update last sync time
+  const lastSync = document.getElementById("firebaseLastSync");
+  if (lastSync) {
+    const lastSyncTime = localStorage.getItem("firebaseLastSync");
+    if (lastSyncTime) {
+      const date = new Date(lastSyncTime);
+      lastSync.textContent = date.toLocaleString();
+    } else {
+      lastSync.textContent = "Never";
+    }
+  }
+
+  // Update toggle button text
+  const toggleBtn = document.getElementById("toggleAutoSaveBtn");
+  if (toggleBtn) {
+    toggleBtn.textContent = status.autoSave ? "Disable" : "Enable";
+    toggleBtn.className = status.autoSave ? "clear-btn" : "upload-btn";
+  }
+}
+
+function setupFirebaseEventListeners(dashboard) {
+  // Prevent duplicate event listeners
+  if (window.firebaseEventListenersSetup) return;
+  window.firebaseEventListenersSetup = true;
+
+  // Auto-save toggle
+  const toggleAutoSaveBtn = document.getElementById("toggleAutoSaveBtn");
+  if (toggleAutoSaveBtn) {
+    toggleAutoSaveBtn.addEventListener("click", () => {
+      dashboard.toggleFirebaseAutoSave();
+      updateFirebaseStatus(dashboard);
+    });
+  }
+
+  // Manual sync
+  const manualSyncBtn = document.getElementById("manualSyncBtn");
+  const syncFirebaseBtn = document.getElementById("syncFirebaseBtn");
+
+  const handleSync = async () => {
+    await dashboard.syncWithFirebase();
+    updateFirebaseStatus(dashboard);
+    updateFirebaseDataTable(dashboard);
+    localStorage.setItem("firebaseLastSync", new Date().toISOString());
+  };
+
+  if (manualSyncBtn) {
+    manualSyncBtn.addEventListener("click", handleSync);
+  }
+  if (syncFirebaseBtn) {
+    syncFirebaseBtn.addEventListener("click", handleSync);
+  }
+
+  // Load from Firebase
+  const loadFromFirebaseBtn = document.getElementById("loadFromFirebaseBtn");
+  if (loadFromFirebaseBtn) {
+    loadFromFirebaseBtn.addEventListener("click", async () => {
+      if (
+        confirm(
+          "This will replace all local data with data from Firebase. Continue?"
+        )
+      ) {
+        await dashboard.loadDataFromFirebase();
+        updateFirebaseStatus(dashboard);
+        updateFirebaseDataTable(dashboard);
+        localStorage.setItem("firebaseLastSync", new Date().toISOString());
+      }
+    });
+  }
+
+  // Clear local data
+  const clearLocalDataBtn = document.getElementById("clearLocalDataBtn");
+  if (clearLocalDataBtn) {
+    clearLocalDataBtn.addEventListener("click", () => {
+      if (
+        confirm(
+          "This will clear all local data. Firebase data will remain safe. Continue?"
+        )
+      ) {
+        dashboard.clearAllData();
+        updateFirebaseStatus(dashboard);
+        updateFirebaseDataTable(dashboard);
+      }
+    });
+  }
+
+  // Refresh status
+  const refreshFirebaseDataBtn = document.getElementById(
+    "refreshFirebaseDataBtn"
+  );
+  if (refreshFirebaseDataBtn) {
+    refreshFirebaseDataBtn.addEventListener("click", () => {
+      updateFirebaseStatus(dashboard);
+      updateFirebaseDataTable(dashboard);
+      showToast("Firebase status refreshed", "info");
+    });
+  }
+
+  // Export Firebase data
+  const exportFirebaseDataBtn = document.getElementById(
+    "exportFirebaseDataBtn"
+  );
+  if (exportFirebaseDataBtn) {
+    exportFirebaseDataBtn.addEventListener("click", async () => {
+      try {
+        dashboard.showLoading();
+        const firebaseData =
+          (await dashboard.firebaseService?.loadAllFPSData()) || [];
+
+        if (firebaseData.length === 0) {
+          showToast("No Firebase data to export", "warning");
+          return;
+        }
+
+        const dataStr = JSON.stringify(firebaseData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `firebase-fps-data-${
+          new Date().toISOString().split("T")[0]
+        }.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast("Firebase data exported successfully", "success");
+      } catch (error) {
+        console.error("Export error:", error);
+        showToast("Failed to export Firebase data", "error");
+      } finally {
+        dashboard.hideLoading();
+      }
+    });
+  }
+
+  // View sync logs
+  const viewFirebaseLogsBtn = document.getElementById("viewFirebaseLogsBtn");
+  if (viewFirebaseLogsBtn) {
+    viewFirebaseLogsBtn.addEventListener("click", () => {
+      showFirebaseLogs();
+    });
+  }
+}
+
+function updateFirebaseDataTable(dashboard) {
+  const container = document.getElementById("firebaseDataTableContent");
+  if (!container) return;
+
+  const status = dashboard.getFirebaseStatus();
+
+  if (status.localDataCount === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>No data available</h3>
+        <p>Upload data or sync with Firebase to see cloud storage contents here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Show local data with Firebase sync status
+  let tableHtml = `
+    <table class="dashboard-table">
+      <thead>
+        <tr>
+          <th>App Name</th>
+          <th>Package Name</th>
+          <th>Avg FPS</th>
+          <th>Device</th>
+          <th>Upload Time</th>
+          <th>Firebase Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  dashboard.uploadedData.forEach((data, index) => {
+    const deviceInfo = data.deviceInfo || {};
+    const device = `${deviceInfo["ro.product.manufacturer"] || "Unknown"} ${
+      deviceInfo["ro.product.model"] || "Unknown"
+    }`;
+    const isSynced = dashboard.firebaseDataIds.has(index);
+    const firebaseId = dashboard.firebaseDataIds.get(index);
+
+    tableHtml += `
+      <tr>
+        <td title="${
+          data.appName || "N/A"
+        }" style="color: var(--primary-light);">${data.appName || "N/A"}</td>
+        <td title="${data.packageName || "N/A"}">${
+      data.packageName || "N/A"
+    }</td>
+        <td><strong>${
+          data.avgFps ? data.avgFps.toFixed(2) : "N/A"
+        }</strong></td>
+        <td title="${device}">${device}</td>
+        <td title="${data.timestamp || "N/A"}">${data.timestamp || "N/A"}</td>
+        <td>
+          ${
+            isSynced
+              ? `<span style="color: var(--success-color); font-weight: 600;">✅ Synced</span><br><span style="color: var(--text-secondary); font-size: 0.7rem;">${firebaseId}</span>`
+              : `<span style="color: var(--warning-color); font-weight: 600;">⏳ Local Only</span>`
+          }
+        </td>
+        <td>
+          ${
+            !isSynced
+              ? `<button onclick="syncSingleRecord(${index})" style="
+                background: var(--success-color);
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.7rem;
+                font-weight: 600;
+                margin-right: 4px;
+              ">
+                🔄 Sync
+              </button>`
+              : `<button onclick="viewFirebaseRecord('${firebaseId}')" style="
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.7rem;
+                font-weight: 600;
+                margin-right: 4px;
+              ">
+                👁️ View
+              </button>`
+          }
+        </td>
+      </tr>
+    `;
+  });
+
+  tableHtml += `</tbody></table>`;
+  container.innerHTML = tableHtml;
+}
+
+function showFirebaseLogs() {
+  const logs = JSON.parse(localStorage.getItem("firebaseLogs") || "[]");
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: center; align-items: center; z-index: 3000; padding: 20px;
+  `;
+
+  let logsHtml = "";
+  if (logs.length === 0) {
+    logsHtml =
+      '<p style="color: var(--text-secondary); text-align: center;">No sync logs available</p>';
+  } else {
+    logsHtml = logs
+      .slice(-50)
+      .reverse()
+      .map(
+        (log) => `
+      <div style="
+        padding: 10px;
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        border-left: 3px solid ${
+          log.type === "error"
+            ? "var(--error-color)"
+            : log.type === "success"
+            ? "var(--success-color)"
+            : "var(--primary-color)"
+        };
+      ">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem;">${
+            log.action
+          }</span>
+          <span style="color: var(--text-secondary); font-size: 0.8rem;">${new Date(
+            log.timestamp
+          ).toLocaleString()}</span>
+        </div>
+        <div style="color: var(--text-secondary); font-size: 0.85rem;">${
+          log.message
+        }</div>
+        ${
+          log.details
+            ? `<div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 5px; font-family: 'Roboto Mono', monospace;">${log.details}</div>`
+            : ""
+        }
+      </div>
+    `
+      )
+      .join("");
+  }
+
+  modal.innerHTML = `
+    <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
+                 padding: 30px; max-width: 800px; width: 95%; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--text-primary); margin: 0;">🔥 Firebase Sync Logs</h3>
+        <button onclick="closeFirebaseLogsModal()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+      </div>
+      <div style="max-height: 60vh; overflow-y: auto;">
+        ${logsHtml}
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button onclick="clearFirebaseLogs()" style="padding: 10px 20px; border-radius: var(--btn-radius); border: none; background: var(--error-color); color: white; cursor: pointer; font-weight: 600;">🗑️ Clear Logs</button>
+        <button onclick="closeFirebaseLogsModal()" style="padding: 10px 20px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; font-weight: 600;">Close</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  window.currentFirebaseLogsModal = modal;
+}
+
+// Global hotlist functions for inline chip management
+window.addHotlistToRun = function (hotlistId, runIndex) {
+  const dashboard = window.dashboard;
+  if (!dashboard) return;
+
+  try {
+    dashboard.addRunToHotlist(hotlistId, runIndex);
+    populateRunHotlists(currentAnalysisData);
+    showToast("Added to hotlist", "success");
+  } catch (error) {
+    console.error("Add hotlist error:", error);
+    showToast("Failed to add to hotlist", "error");
+  }
+};
+
+window.removeHotlistFromRun = function (hotlistId, runIndex) {
+  const dashboard = window.dashboard;
+  if (!dashboard) return;
+
+  try {
+    dashboard.removeRunFromHotlist(hotlistId, runIndex);
+    populateRunHotlists(currentAnalysisData);
+    showToast("Removed from hotlist", "success");
+  } catch (error) {
+    console.error("Remove hotlist error:", error);
+    showToast("Failed to remove from hotlist", "error");
+  }
+};
+
+window.showHotlistSelectionPopup = function (runIndex) {
+  const dashboard = window.dashboard;
+  const allHotlists = dashboard.getAllHotlists();
+  const runHotlists = dashboard.getHotlistsForRun(runIndex);
+  const assignedHotlistIds = runHotlists.map((h) => h.id);
+  const availableHotlists = allHotlists.filter(
+    (h) => !assignedHotlistIds.includes(h.id)
+  );
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: center; align-items: center; z-index: 3000;
+  `;
+
+  let contentHtml = `
+    <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
+                 padding: 20px; width: 450px; max-height: 600px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--text-primary); margin: 0; font-size: 1.1rem;">Add Hotlist</h3>
+        <button onclick="closeHotlistSelectionPopup()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.2rem; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+      </div>
+      
+      <!-- Create new hotlist option at top -->
+      <button onclick="showCreateHotlistInPopup(${runIndex})" style="
+        width: 100%;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+      " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
+        ➕ Create New Hotlist
+      </button>
+      
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; flex: 1; display: flex; flex-direction: column; min-height: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h4 style="color: var(--text-primary); margin: 0; font-size: 0.9rem;">Available Hotlists:</h4>
+          <span id="hotlistCount" style="color: var(--text-secondary); font-size: 0.8rem;">${availableHotlists.length} available</span>
+        </div>
+        
+        <!-- Search filter -->
+        <div style="margin-bottom: 15px; flex-shrink: 0;">
+          <input type="text" id="hotlistSearchInput" placeholder="🔍 Search hotlists..." 
+                 style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.85rem; box-sizing: border-box;"
+                 oninput="filterHotlistsInPopup()" />
+        </div>
+        
+        <!-- Hotlists container with scroll -->
+        <div id="hotlistsContainer" style="flex: 1; overflow-y: auto; min-height: 0;">
+  `;
+
+  if (availableHotlists.length === 0) {
+    contentHtml += `
+      <p style="color: var(--text-secondary); text-align: center; margin: 20px 0; font-size: 0.9rem;">
+        All available hotlists are already assigned to this run.
+      </p>
+    `;
+  } else {
+    availableHotlists.forEach((hotlist) => {
+      contentHtml += `
+        <button class="hotlist-item" data-name="${hotlist.name.toLowerCase()}" data-description="${(
+        hotlist.description || ""
+      ).toLowerCase()}" onclick="addHotlistToRun('${
+        hotlist.id
+      }', ${runIndex}); closeHotlistSelectionPopup();" style="
+          width: 100%;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: var(--text-primary);
+          padding: 10px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+          margin-bottom: 8px;
+          text-align: left;
+          transition: all 0.3s ease;
+          display: block;
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='var(--primary-color)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
+          <div style="font-weight: 600;">🏷️ ${hotlist.name}</div>
+          ${
+            hotlist.description
+              ? `<div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 2px;">${hotlist.description}</div>`
+              : ""
+          }
+        </button>
+      `;
+    });
+  }
+
+  contentHtml += `
+        </div>
+        
+        <!-- No results message (hidden by default) -->
+        <div id="noHotlistResults" style="display: none; color: var(--text-secondary); text-align: center; margin: 20px 0; font-size: 0.9rem;">
+          <div style="margin-bottom: 8px;">🔍 No hotlists found</div>
+          <div style="font-size: 0.8rem;">Try adjusting your search terms</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = contentHtml;
+  document.body.appendChild(modal);
+  window.currentHotlistSelectionModal = modal;
+
+  // Store available hotlists for filtering
+  window.currentAvailableHotlists = availableHotlists;
+
+  // Focus on search input
+  setTimeout(() => {
+    const searchInput = document.getElementById("hotlistSearchInput");
+    if (searchInput) {
+      searchInput.focus();
+    }
+  }, 100);
+};
+
+window.closeHotlistSelectionPopup = function () {
+  if (window.currentHotlistSelectionModal) {
+    document.body.removeChild(window.currentHotlistSelectionModal);
+    window.currentHotlistSelectionModal = null;
+  }
+};
+
+window.showCreateHotlistInPopup = function (runIndex) {
+  // Close the selection popup first
+  closeHotlistSelectionPopup();
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: center; align-items: center; z-index: 3000;
+  `;
+
+  modal.innerHTML = `
+    <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
+                 padding: 25px; width: 400px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--text-primary); margin: 0; font-size: 1.1rem;">Create New Hotlist</h3>
+        <button onclick="closeCreateHotlistPopup()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.2rem; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">Hotlist Name:</label>
+        <input type="text" id="popupHotlistName" placeholder="Enter hotlist name"
+               style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; box-sizing: border-box;" />
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">Description (optional):</label>
+        <textarea id="popupHotlistDescription" placeholder="Enter description"
+                  style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; min-height: 60px; resize: vertical; box-sizing: border-box;"></textarea>
+      </div>
+      
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button onclick="closeCreateHotlistPopup()" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 0.9rem;">Cancel</button>
+        <button onclick="createHotlistAndAssign(${runIndex})" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary-color); color: white; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Create & Assign</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  window.currentCreateHotlistModal = modal;
+
+  // Focus on the name input
+  setTimeout(() => {
+    document.getElementById("popupHotlistName").focus();
+  }, 100);
+};
+
+window.closeCreateHotlistPopup = function () {
+  if (window.currentCreateHotlistModal) {
+    document.body.removeChild(window.currentCreateHotlistModal);
+    window.currentCreateHotlistModal = null;
+  }
+};
+
+window.createHotlistAndAssign = function (runIndex) {
+  const name = document.getElementById("popupHotlistName").value.trim();
+  const description = document
+    .getElementById("popupHotlistDescription")
+    .value.trim();
+
+  if (!name) {
+    showToast("Please enter a hotlist name", "warning");
+    return;
+  }
+
+  try {
+    const dashboard = window.dashboard;
+    const hotlistId = dashboard.createHotlist(name, description);
+    dashboard.addRunToHotlist(hotlistId, runIndex);
+    populateRunHotlists(currentAnalysisData);
+    closeCreateHotlistPopup();
+    showToast(`Created "${name}" and assigned to run`, "success");
+  } catch (error) {
+    console.error("Create hotlist error:", error);
+    showToast("Failed to create hotlist", "error");
+  }
+};
+
+// Global function for filtering hotlists in the popup
+window.filterHotlistsInPopup = function () {
+  const searchInput = document.getElementById("hotlistSearchInput");
+  const hotlistItems = document.querySelectorAll(".hotlist-item");
+  const noResultsMessage = document.getElementById("noHotlistResults");
+  const hotlistCount = document.getElementById("hotlistCount");
+
+  if (!searchInput || !hotlistItems || !noResultsMessage || !hotlistCount)
+    return;
+
+  const searchTerm = searchInput.value.toLowerCase().trim();
+  let visibleCount = 0;
+
+  hotlistItems.forEach((item) => {
+    const name = item.getAttribute("data-name") || "";
+    const description = item.getAttribute("data-description") || "";
+
+    const matches =
+      name.includes(searchTerm) || description.includes(searchTerm);
+
+    if (matches) {
+      item.style.display = "block";
+      visibleCount++;
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+  // Update count and show/hide no results message
+  hotlistCount.textContent = `${visibleCount} available`;
+
+  if (visibleCount === 0 && searchTerm !== "") {
+    noResultsMessage.style.display = "block";
+  } else {
+    noResultsMessage.style.display = "none";
+  }
+};
+
+// Global function for filtering hotlist table
+window.filterHotlistTable = function () {
+  const searchInput = document.getElementById("hotlistSearchInput");
+  const hotlistRows = document.querySelectorAll(".hotlist-row");
+
+  if (!searchInput || !hotlistRows) return;
+
+  const searchTerm = searchInput.value.toLowerCase().trim();
+  let visibleCount = 0;
+
+  hotlistRows.forEach((row) => {
+    const name = row.getAttribute("data-name") || "";
+    const description = row.getAttribute("data-description") || "";
+
+    const matches =
+      name.includes(searchTerm) || description.includes(searchTerm);
+
+    if (matches) {
+      row.style.display = "table-row";
+      visibleCount++;
+    } else {
+      row.style.display = "none";
+    }
+  });
+};
+
+// Global functions for hotlist table selection
+window.toggleAllHotlistsSelection = function (checked) {
+  const checkboxes = document.querySelectorAll(".hotlist-checkbox");
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = checked;
+  });
+  updateHotlistSelection();
+};
+
+window.updateHotlistSelection = function () {
+  const checkboxes = document.querySelectorAll(".hotlist-checkbox");
+  const checkedBoxes = document.querySelectorAll(".hotlist-checkbox:checked");
+  const selectAllCheckbox = document.getElementById("selectAllHotlists");
+  const bulkActions = document.getElementById("hotlistBulkActions");
+  const selectedCount = document.getElementById("selectedHotlistsCount");
+
+  // Update select all checkbox state
+  if (selectAllCheckbox) {
+    if (checkedBoxes.length === 0) {
+      selectAllCheckbox.indeterminate = false;
+      selectAllCheckbox.checked = false;
+    } else if (checkedBoxes.length === checkboxes.length) {
+      selectAllCheckbox.indeterminate = false;
+      selectAllCheckbox.checked = true;
+    } else {
+      selectAllCheckbox.indeterminate = true;
+      selectAllCheckbox.checked = false;
+    }
+  }
+
+  // Show/hide bulk actions
+  if (bulkActions && selectedCount) {
+    if (checkedBoxes.length > 0) {
+      bulkActions.style.display = "block";
+      selectedCount.textContent = `${checkedBoxes.length} hotlists selected`;
+    } else {
+      bulkActions.style.display = "none";
+    }
+  }
+};
+
+window.clearHotlistSelection = function () {
+  const checkboxes = document.querySelectorAll(".hotlist-checkbox");
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+  updateHotlistSelection();
+};
+
+window.bulkDeleteHotlists = function () {
+  const checkedBoxes = document.querySelectorAll(".hotlist-checkbox:checked");
+  if (checkedBoxes.length === 0) {
+    showToast("No hotlists selected", "warning");
+    return;
+  }
+
+  const selectedHotlistIds = Array.from(checkedBoxes).map((checkbox) =>
+    checkbox.getAttribute("data-hotlist-id")
+  );
+
+  if (
+    confirm(
+      `Are you sure you want to delete ${selectedHotlistIds.length} hotlists? This action cannot be undone.`
+    )
+  ) {
+    const dashboard = window.dashboard;
+    let deletedCount = 0;
+
+    selectedHotlistIds.forEach((hotlistId) => {
+      try {
+        dashboard.deleteHotlist(hotlistId);
+        deletedCount++;
+      } catch (error) {
+        console.error("Delete hotlist error:", error);
+      }
+    });
+
+    showToast(`Successfully deleted ${deletedCount} hotlists`, "success");
+    clearHotlistSelection();
+  }
+};
+
+// Global Firebase functions
+window.syncSingleRecord = async function (index) {
+  const dashboard = window.dashboard;
+  if (!dashboard) return;
+
+  try {
+    const data = dashboard.uploadedData[index];
+    await dashboard.saveDataToFirebase(data, index);
+    updateFirebaseStatus(dashboard);
+    updateFirebaseDataTable(dashboard);
+    showToast("Record synced to Firebase", "success");
+  } catch (error) {
+    console.error("Sync error:", error);
+    showToast("Failed to sync record", "error");
+  }
+};
+
+window.viewFirebaseRecord = function (firebaseId) {
+  showToast(`Firebase Record ID: ${firebaseId}`, "info");
+};
+
+window.closeFirebaseLogsModal = function () {
+  if (window.currentFirebaseLogsModal) {
+    document.body.removeChild(window.currentFirebaseLogsModal);
+    window.currentFirebaseLogsModal = null;
+  }
+};
+
+window.clearFirebaseLogs = function () {
+  if (confirm("Are you sure you want to clear all Firebase sync logs?")) {
+    localStorage.removeItem("firebaseLogs");
+    showToast("Firebase logs cleared", "success");
+    closeFirebaseLogsModal();
+  }
+};
