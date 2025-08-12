@@ -170,7 +170,9 @@ export function updateTableWithCheckboxes(dashboard) {
     <table class="dashboard-table">
       <thead>
         <tr>
-          <th>Select</th>
+          <th style="text-align: center;">
+            <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllSelection(this.checked)" style="width: 16px; height: 16px; accent-color: var(--primary-color);" title="Select/Deselect All" />
+          </th>
           <th>App Name</th>
           <th>Package Name</th>
           <th data-tooltip="Represents actual user experience. Calculated from the hardware V-sync timestamp ('frame.vsync').">
@@ -392,17 +394,78 @@ export function createPerformanceTable(containerId, data, type) {
 // --- Modal Management ---
 
 export async function promptForAppNames(files) {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
+    // Get existing hotlists
+    const allHotlists = HotlistManager.getAllHotlists();
+
     const modal = document.createElement("div");
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
         display: flex; justify-content: center; align-items: center; z-index: 3000;
       `;
+
     let modalContent = `
         <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
-                     padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
-          <h3 style="color: var(--text-primary); margin-top: 0;">Enter App Names</h3>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Please provide the app name for each uploaded file:</p>
+                     padding: 30px; max-width: 600px; width: 95%; max-height: 85vh; overflow-y: auto;">
+          <h3 style="color: var(--text-primary); margin-top: 0;">Enter App Names & Select Hotlists</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Please provide the app name for each uploaded file and optionally assign them to hotlists:</p>
+          
+          <!-- Global Hotlist Selection -->
+          <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <h4 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 0.95rem;">🏷️ Assign to Hotlists (applies to all files)</h4>
+            <div id="globalHotlistSelection" style="margin-bottom: 10px;">
+              ${
+                allHotlists.length > 0
+                  ? `
+                <div style="position: relative;">
+                  <input type="text" id="hotlistSearch" placeholder="🔍 Search hotlists..." 
+                         style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.85rem; box-sizing: border-box; margin-bottom: 10px;"
+                         oninput="filterHotlistOptions()" />
+                  <div id="hotlistOptions" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg-color);">
+                    ${allHotlists
+                      .map(
+                        (hotlist) => `
+                      <div class="hotlist-option" data-name="${hotlist.name.toLowerCase()}" data-description="${(
+                          hotlist.description || ""
+                        ).toLowerCase()}" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'" onclick="toggleHotlistSelection('${
+                          hotlist.id
+                        }', this)">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <input type="checkbox" id="hotlist_${
+                            hotlist.id
+                          }" style="width: 16px; height: 16px; accent-color: var(--primary-color);" onchange="event.stopPropagation()" />
+                          <div style="flex: 1;">
+                            <div style="color: var(--text-primary); font-weight: 500; font-size: 0.85rem;">🏷️ ${
+                              hotlist.name
+                            }</div>
+                            ${
+                              hotlist.description
+                                ? `<div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 2px;">${hotlist.description}</div>`
+                                : ""
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+                  : `
+                <div style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 20px;">
+                  No hotlists available. You can create hotlists after uploading files.
+                </div>
+              `
+              }
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button id="clearAllHotlists" style="padding: 6px 12px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 0.8rem;">Clear All</button>
+              <button id="selectAllHotlists" style="padding: 6px 12px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 0.8rem;">Select All</button>
+            </div>
+          </div>
+
+          <!-- App Names Section -->
           <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
               <button id="clearAll" style="padding: 8px 16px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 600;">🗑️ Clear All</button>
@@ -429,17 +492,63 @@ export async function promptForAppNames(files) {
     modal.innerHTML = modalContent;
     document.body.appendChild(modal);
 
+    // Add hotlist filtering functionality
+    window.filterHotlistOptions = function () {
+      const searchInput = document.getElementById("hotlistSearch");
+      const hotlistOptions = document.querySelectorAll(".hotlist-option");
+
+      if (!searchInput || !hotlistOptions) return;
+
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      hotlistOptions.forEach((option) => {
+        const name = option.getAttribute("data-name") || "";
+        const description = option.getAttribute("data-description") || "";
+
+        const matches =
+          name.includes(searchTerm) || description.includes(searchTerm);
+        option.style.display = matches ? "block" : "none";
+      });
+    };
+
+    // Add hotlist selection functionality
+    window.toggleHotlistSelection = function (hotlistId, element) {
+      const checkbox = document.getElementById(`hotlist_${hotlistId}`);
+      if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+      }
+    };
+
     document.getElementById("clearAll").onclick = () => {
       files.forEach((_, index) => {
         document.getElementById(`appName_${index}`).value = "";
       });
     };
+
+    document.getElementById("clearAllHotlists").onclick = () => {
+      allHotlists.forEach((hotlist) => {
+        const checkbox = document.getElementById(`hotlist_${hotlist.id}`);
+        if (checkbox) checkbox.checked = false;
+      });
+    };
+
+    document.getElementById("selectAllHotlists").onclick = () => {
+      allHotlists.forEach((hotlist) => {
+        const checkbox = document.getElementById(`hotlist_${hotlist.id}`);
+        if (checkbox) checkbox.checked = true;
+      });
+    };
+
     document.getElementById("cancelAppNames").onclick = () => {
       document.body.removeChild(modal);
       resolve(null);
     };
+
     document.getElementById("confirmAppNames").onclick = () => {
       const appNames = [];
+      const selectedHotlists = [];
+
+      // Validate app names
       let allValid = true;
       for (let i = 0; i < files.length; i++) {
         const input = document.getElementById(`appName_${i}`);
@@ -452,9 +561,18 @@ export async function promptForAppNames(files) {
           appNames.push(appName);
         }
       }
+
+      // Get selected hotlists
+      allHotlists.forEach((hotlist) => {
+        const checkbox = document.getElementById(`hotlist_${hotlist.id}`);
+        if (checkbox && checkbox.checked) {
+          selectedHotlists.push(hotlist.id);
+        }
+      });
+
       if (allValid) {
         document.body.removeChild(modal);
-        resolve(appNames);
+        resolve({ appNames, selectedHotlists });
       }
     };
   });
@@ -481,7 +599,9 @@ export function updateTableWithPagination(dashboard) {
     <table class="dashboard-table">
       <thead>
         <tr>
-          <th>Select</th>
+          <th style="text-align: center;">
+            <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllSelection(this.checked)" style="width: 16px; height: 16px; accent-color: var(--primary-color);" title="Select/Deselect All" />
+          </th>
           <th>App Name</th>
           <th>Package Name</th>
           <th>Avg FPS</th>
@@ -980,10 +1100,24 @@ function populateRunHotlists(data) {
 
   if (runIndex === -1) return;
 
-  // Get hotlists for this run and all available hotlists
-  const runHotlists = dashboard.getHotlistsForRun(runIndex);
+  // Get hotlists from the data itself first, then fallback to hotlist manager
+  let runHotlists = [];
+  let assignedHotlistIds = [];
+
+  if (data.hotlistIds && Array.isArray(data.hotlistIds)) {
+    // Use hotlist IDs stored in the data record
+    const allHotlists = dashboard.getAllHotlists();
+    runHotlists = data.hotlistIds
+      .map((hotlistId) => allHotlists.find((h) => h.id === hotlistId))
+      .filter(Boolean); // Remove any undefined hotlists
+    assignedHotlistIds = data.hotlistIds;
+  } else {
+    // Fallback to hotlist manager method
+    runHotlists = dashboard.getHotlistsForRun(runIndex);
+    assignedHotlistIds = runHotlists.map((h) => h.id);
+  }
+
   const allHotlists = dashboard.getAllHotlists();
-  const assignedHotlistIds = runHotlists.map((h) => h.id);
 
   // Sort unassigned hotlists by usage frequency (most used first)
   const suggestedHotlists = allHotlists
@@ -1179,7 +1313,14 @@ export function clearAIAnalysis() {
 }
 
 export function showAIConfig() {
+  // Check if modal already exists and remove it
+  const existingModal = document.getElementById("aiConfigModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
   const configModal = document.createElement("div");
+  configModal.id = "aiConfigModal";
   configModal.style.cssText = `
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
       display: flex; justify-content: center; align-items: center; z-index: 3000;
@@ -1203,7 +1344,13 @@ export function showAIConfig() {
     `;
   document.body.appendChild(configModal);
 
-  const close = () => document.body.removeChild(configModal);
+  const close = () => {
+    const modal = document.getElementById("aiConfigModal");
+    if (modal) {
+      modal.remove();
+    }
+  };
+
   document.getElementById("cancelAIConfig").onclick = close;
   document.getElementById("saveAIConfig").onclick = () => {
     const apiKey = document.getElementById("geminiApiKeyInput").value.trim();
@@ -1215,6 +1362,15 @@ export function showAIConfig() {
       alert("Please enter a valid API key.");
     }
   };
+
+  // Add escape key handler
+  const handleEscape = (e) => {
+    if (e.key === "Escape") {
+      close();
+      document.removeEventListener("keydown", handleEscape);
+    }
+  };
+  document.addEventListener("keydown", handleEscape);
 }
 
 // --- Hotlist Table Pagination and Selection Functions ---
@@ -1411,14 +1567,31 @@ export function updateCompareControls(dashboard) {
   const compareControls = document.getElementById("compareControls");
   const selectedCount = document.getElementById("selectedCount");
   const compareBtn = document.getElementById("compareBtn");
+  const deleteBtn = document.getElementById("deleteSelectedBtn");
 
-  if (dashboard.selectedForComparison.size >= 2) {
+  if (dashboard.selectedForComparison.size >= 1) {
     compareControls.classList.add("show");
     selectedCount.textContent = `${dashboard.selectedForComparison.size} selected`;
-    compareBtn.disabled = false;
+
+    // Enable/disable buttons based on selection count
+    if (dashboard.selectedForComparison.size >= 2) {
+      compareBtn.disabled = false;
+      compareBtn.style.display = "flex";
+    } else {
+      compareBtn.disabled = true;
+      compareBtn.style.display = "none";
+    }
+
+    // Always show delete button when items are selected
+    if (deleteBtn) {
+      deleteBtn.style.display = "flex";
+    }
   } else {
     compareControls.classList.remove("show");
     compareBtn.disabled = true;
+    if (deleteBtn) {
+      deleteBtn.style.display = "none";
+    }
   }
 }
 
@@ -1897,55 +2070,88 @@ export function initializeTooltips() {
 
 // --- Hotlist Management UI ---
 
-export function updateHotlistsView(dashboard) {
+export async function updateHotlistsView(dashboard) {
   // Only update if we're in the hotlists section
   const mainContent = document.getElementById("mainContent");
   if (!mainContent || !mainContent.classList.contains("hotlists-view")) {
     return;
   }
 
-  updateHotlistsContainer(dashboard);
+  await updateHotlistsContainer(dashboard);
   updateHotlistFilterButtons(dashboard);
   updateHotlistRunsTable(dashboard);
 }
 
-function updateHotlistsContainer(dashboard) {
+async function updateHotlistsContainer(dashboard) {
   const container = document.getElementById("enhancedHotlistsContainer");
-  const hotlists = dashboard.getAllHotlists();
 
-  if (hotlists.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <h3>No hotlists created yet</h3>
-        <p>Create your first hotlist to organize and filter your performance runs.</p>
-      </div>
-    `;
-    return;
-  }
+  // Show loading state
+  container.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <div style="display: inline-block; width: 32px; height: 32px; border: 3px solid var(--primary-color); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+      <div style="color: var(--text-secondary);">Loading hotlists from Firebase...</div>
+    </div>
+  `;
 
-  // Initialize pagination state if not exists
-  if (!dashboard.hotlistPagination) {
-    dashboard.hotlistPagination = {
-      currentPage: 1,
-      itemsPerPage: 50,
-      isLoading: false,
-      hasMore: true,
-    };
-  }
+  try {
+    // Load hotlists from Firebase collections
+    const { firebaseService } = await import("./firebase-service.js");
+    const hotlistCollections = await firebaseService.getAllHotlists();
 
-  const pagination = dashboard.hotlistPagination;
-  const totalItems = hotlists.length;
-  const startIndex = 0;
-  const endIndex = Math.min(
-    pagination.currentPage * pagination.itemsPerPage,
-    totalItems
-  );
-  const displayedHotlists = hotlists.slice(startIndex, endIndex);
+    // Also get local hotlists for comparison
+    const localHotlists = dashboard.getAllHotlists();
 
-  pagination.hasMore = endIndex < totalItems;
+    // Combine Firebase hotlists with local ones, prioritizing Firebase data
+    const allHotlists = [...hotlistCollections];
 
-  // Add search functionality
-  let html = `
+    // Add any local hotlists that aren't in Firebase
+    localHotlists.forEach((localHotlist) => {
+      const existsInFirebase = hotlistCollections.some(
+        (fbHotlist) =>
+          fbHotlist.name === localHotlist.name ||
+          fbHotlist.id === localHotlist.id
+      );
+      if (!existsInFirebase) {
+        allHotlists.push(localHotlist);
+      }
+    });
+
+    if (allHotlists.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No hotlists created yet</h3>
+          <p>Create your first hotlist to organize and filter your performance runs.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Use the combined hotlists for display
+    const hotlists = allHotlists;
+
+    // Initialize pagination state if not exists
+    if (!dashboard.hotlistPagination) {
+      dashboard.hotlistPagination = {
+        currentPage: 1,
+        itemsPerPage: 50,
+        isLoading: false,
+        hasMore: true,
+      };
+    }
+
+    const pagination = dashboard.hotlistPagination;
+    const totalItems = hotlists.length;
+    const startIndex = 0;
+    const endIndex = Math.min(
+      pagination.currentPage * pagination.itemsPerPage,
+      totalItems
+    );
+    const displayedHotlists = hotlists.slice(startIndex, endIndex);
+
+    pagination.hasMore = endIndex < totalItems;
+
+    // Add search functionality
+    let html = `
     <div style="margin-bottom: 15px;">
       <input type="text" id="hotlistSearchInput" placeholder="🔍 Search hotlists by name or description..." 
              style="width: 100%; padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box;"
@@ -1969,23 +2175,38 @@ function updateHotlistsContainer(dashboard) {
         <tbody id="hotlistTableBody">
   `;
 
-  displayedHotlists.forEach((hotlist) => {
-    const runCount = hotlist.runIds.length;
-    const createdDate = new Date(hotlist.createdAt).toLocaleDateString(
-      "en-US",
-      {
-        month: "short",
-        day: "numeric",
-        year: "2-digit",
-      }
-    );
+    displayedHotlists.forEach((hotlist) => {
+      // Calculate run count using both hotlist manager and direct FPS data references
+      let runCount = hotlist.runIds ? hotlist.runIds.length : 0;
 
-    html += `
+      // Also count runs that have this hotlist ID in their hotlistIds array
+      if (dashboard && dashboard.uploadedData) {
+        const directReferences = dashboard.uploadedData.filter(
+          (data) =>
+            data.hotlistIds &&
+            Array.isArray(data.hotlistIds) &&
+            data.hotlistIds.includes(hotlist.id)
+        ).length;
+
+        // Use the higher count (in case of sync issues, we want to show the actual count)
+        runCount = Math.max(runCount, directReferences);
+      }
+
+      const createdDate = new Date(hotlist.createdAt).toLocaleDateString(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          year: "2-digit",
+        }
+      );
+
+      html += `
       <tr class="hotlist-row" data-name="${hotlist.name.toLowerCase()}" data-description="${(
-      hotlist.description || ""
-    ).toLowerCase()}" style="cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.dashboard.setHotlistFilter('${
-      hotlist.id
-    }')">
+        hotlist.description || ""
+      ).toLowerCase()}" style="cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.dashboard.setHotlistFilter('${
+        hotlist.id
+      }')">
         <td onclick="event.stopPropagation();" style="text-align: center;">
           <input type="checkbox" class="hotlist-checkbox" data-hotlist-id="${
             hotlist.id
@@ -2068,9 +2289,9 @@ function updateHotlistsContainer(dashboard) {
         </td>
       </tr>
     `;
-  });
+    });
 
-  html += `
+    html += `
         </tbody>
       </table>
     </div>
@@ -2079,6 +2300,18 @@ function updateHotlistsContainer(dashboard) {
     <div id="hotlistBulkActions" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
       <div style="display: flex; align-items: center; gap: 15px;">
         <span id="selectedHotlistsCount" style="color: var(--text-secondary); font-size: 0.9rem;">0 hotlists selected</span>
+        <button onclick="bulkEditHotlists()" style="
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: 600;
+        ">
+          ✏️ Edit Selected
+        </button>
         <button onclick="bulkDeleteHotlists()" style="
           background: var(--error-color);
           color: white;
@@ -2135,10 +2368,29 @@ function updateHotlistsContainer(dashboard) {
     </div>
   `;
 
-  container.innerHTML = html;
+    container.innerHTML = html;
 
-  // Set up infinite scroll on table container
-  setupHotlistInfiniteScroll(dashboard);
+    // Set up infinite scroll on table container
+    setupHotlistInfiniteScroll(dashboard);
+  } catch (error) {
+    console.error("Error loading hotlists data:", error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Error loading hotlists data</h3>
+        <p>Failed to load data from Firebase. Please try again.</p>
+        <button onclick="updateHotlistsContainer(window.dashboard)" style="
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 600;
+          margin-top: 10px;
+        ">Retry</button>
+      </div>
+    `;
+  }
 }
 
 function setupHotlistInfiniteScroll(dashboard) {
@@ -2530,377 +2782,370 @@ export function initializeHotlistsSection() {
 
 // --- All Games View ---
 
-export function updateGamesView(uploadedData) {
+export async function updateGamesView(uploadedData) {
   const container = document.getElementById("allGamesContent");
   if (!container) return;
 
-  if (uploadedData.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <h3>No games data available</h3>
-        <p>Upload performance data to see game analysis here.</p>
-      </div>
-    `;
-    return;
-  }
-
-  // Group data by app/game
-  const gameStats = {};
-  uploadedData.forEach((data) => {
-    const appName = data.appName || "Unknown App";
-    if (!gameStats[appName]) {
-      gameStats[appName] = {
-        name: appName,
-        packageName: data.packageName || "Unknown Package",
-        runs: [],
-        totalRuns: 0,
-        avgFps: 0,
-        minFps: Infinity,
-        maxFps: 0,
-        totalFrames: 0,
-        totalTime: 0,
-      };
-    }
-
-    gameStats[appName].runs.push(data);
-    gameStats[appName].totalRuns++;
-    gameStats[appName].totalFrames += data.totalFrames || 0;
-    gameStats[appName].totalTime += data.elapsedTimeSeconds || 0;
-
-    if (data.avgFps) {
-      gameStats[appName].minFps = Math.min(
-        gameStats[appName].minFps,
-        data.avgFps
-      );
-      gameStats[appName].maxFps = Math.max(
-        gameStats[appName].maxFps,
-        data.avgFps
-      );
-    }
-  });
-
-  // Calculate averages
-  Object.values(gameStats).forEach((game) => {
-    const totalFps = game.runs.reduce((sum, run) => sum + (run.avgFps || 0), 0);
-    game.avgFps =
-      game.totalRuns > 0 ? (totalFps / game.totalRuns).toFixed(1) : 0;
-    if (game.minFps === Infinity) game.minFps = 0;
-  });
-
-  // Sort by average FPS
-  const sortedGames = Object.values(gameStats).sort(
-    (a, b) => b.avgFps - a.avgFps
-  );
-
-  let html = `
-    <div style="margin-bottom: 20px;">
-      <h2 style="color: var(--text-primary); margin-bottom: 10px;">🎮 All Games Performance</h2>
-      <p style="color: var(--text-secondary);">Comprehensive performance analysis for all tested games</p>
+  // Show loading state
+  container.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <div style="display: inline-block; width: 32px; height: 32px; border: 3px solid var(--primary-color); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+      <div style="color: var(--text-secondary);">Loading games data from Firebase...</div>
     </div>
-    <div style="display: grid; gap: 15px;">
   `;
 
-  sortedGames.forEach((game, index) => {
-    const rank = index + 1;
-    const performanceClass =
-      game.avgFps >= 50 ? "excellent" : game.avgFps >= 30 ? "good" : "poor";
+  try {
+    // Load package name collections from Firebase
+    const { firebaseService } = await import("./firebase-service.js");
+    const packageCollections = await firebaseService.getAllPackageNames();
 
-    html += `
-      <div class="game-card" style="
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-      " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-          <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-              <span style="
+    if (packageCollections.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No games data available</h3>
+          <p>Upload performance data to see game analysis here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Sort by total records (most tested games first)
+    const sortedGames = packageCollections.sort(
+      (a, b) => b.totalRecords - a.totalRecords
+    );
+
+    let html = `
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: var(--text-primary); margin-bottom: 10px;">🎮 All Games Performance</h2>
+        <p style="color: var(--text-secondary);">Comprehensive performance analysis for all tested games (${
+          sortedGames.length
+        } games, ${sortedGames.reduce(
+      (sum, game) => sum + game.totalRecords,
+      0
+    )} total runs)</p>
+      </div>
+      <div style="display: grid; gap: 15px;">
+    `;
+
+    sortedGames.forEach((game, index) => {
+      const rank = index + 1;
+
+      html += `
+        <div class="game-card" style="
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          padding: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <span style="
+                  background: var(--primary-color);
+                  color: white;
+                  padding: 4px 8px;
+                  border-radius: 12px;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                ">#${rank}</span>
+                <h3 style="color: var(--text-primary); margin: 0; font-size: 1.2rem; font-weight: 600;">
+                  🎮 ${game.appName}
+                </h3>
+              </div>
+              <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                ${game.packageName}
+              </p>
+            </div>
+            <div style="text-align: right;">
+              <div style="
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+              ">
+                ${game.totalRecords}
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Total Runs</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
+                game.fpsDataReferences.length
+              }</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Firebase Records</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${new Date(
+                game.createdAt
+              ).toLocaleDateString()}</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">First Tested</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${new Date(
+                game.updatedAt
+              ).toLocaleDateString()}</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Last Updated</div>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">
+              Package: ${game.packageName}
+            </span>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="filterByGame('${game.appName}')" style="
                 background: var(--primary-color);
                 color: white;
-                padding: 4px 8px;
-                border-radius: 12px;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
                 font-size: 0.8rem;
                 font-weight: 600;
-              ">#${rank}</span>
-              <h3 style="color: var(--text-primary); margin: 0; font-size: 1.2rem; font-weight: 600;">
-                🎮 ${game.name}
-              </h3>
+                transition: all 0.2s ease;
+              " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
+                🔍 View Runs
+              </button>
+              <button onclick="viewGameDetails('${game.packageName}')" style="
+                background: var(--success-color);
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                font-weight: 600;
+                transition: all 0.2s ease;
+              " onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--success-color)'">
+                📊 Details
+              </button>
             </div>
-            <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
-              ${game.packageName}
-            </p>
-          </div>
-          <div style="text-align: right;">
-            <div style="
-              font-size: 1.5rem;
-              font-weight: bold;
-              color: ${
-                performanceClass === "excellent"
-                  ? "var(--success-color)"
-                  : performanceClass === "good"
-                  ? "var(--warning-color)"
-                  : "var(--error-color)"
-              };
-            ">
-              ${game.avgFps} FPS
-            </div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Average</div>
           </div>
         </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              game.totalRuns
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Total Runs</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              game.minFps
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Min FPS</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              game.maxFps
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Max FPS</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${game.totalTime.toFixed(
-              1
-            )}s</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Total Time</div>
-          </div>
-        </div>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-          <span style="color: var(--text-secondary); font-size: 0.8rem;">
-            ${game.totalFrames.toLocaleString()} total frames
-          </span>
-          <button onclick="filterByGame('${game.name}')" style="
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-          " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
-            🔍 View Runs
-          </button>
-        </div>
+      `;
+    });
+
+    html += "</div>";
+    container.innerHTML = html;
+  } catch (error) {
+    console.error("Error loading games data:", error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Error loading games data</h3>
+        <p>Failed to load data from Firebase. Please try again.</p>
+        <button onclick="updateGamesView([])" style="
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 600;
+          margin-top: 10px;
+        ">Retry</button>
       </div>
     `;
-  });
-
-  html += "</div>";
-  container.innerHTML = html;
+  }
 }
 
 // --- All Devices View ---
 
-export function updateDevicesView(uploadedData) {
+export async function updateDevicesView(uploadedData) {
   const container = document.getElementById("allDevicesContent");
   if (!container) return;
 
-  if (uploadedData.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <h3>No device data available</h3>
-        <p>Upload performance data to see device analysis here.</p>
-      </div>
-    `;
-    return;
-  }
-
-  // Group data by device
-  const deviceStats = {};
-  uploadedData.forEach((data) => {
-    const deviceInfo = data.deviceInfo || {};
-    const manufacturer = deviceInfo["ro.product.manufacturer"] || "Unknown";
-    const model = deviceInfo["ro.product.model"] || "Unknown";
-    const deviceKey = `${manufacturer} ${model}`;
-
-    if (!deviceStats[deviceKey]) {
-      deviceStats[deviceKey] = {
-        manufacturer,
-        model,
-        deviceKey,
-        runs: [],
-        totalRuns: 0,
-        avgFps: 0,
-        minFps: Infinity,
-        maxFps: 0,
-        apps: new Set(),
-        socModel: deviceInfo["ro.soc.model"] || "Unknown",
-        androidVersion: deviceInfo["ro.build.version.release"] || "Unknown",
-        totalMemoryGB: "Unknown",
-      };
-
-      // Calculate memory
-      if (deviceInfo.MemTotal) {
-        const memKB = parseFloat(deviceInfo.MemTotal.replace(" kB", ""));
-        if (!isNaN(memKB)) {
-          deviceStats[deviceKey].totalMemoryGB = (
-            memKB /
-            (1024 * 1024)
-          ).toFixed(1);
-        }
-      }
-    }
-
-    deviceStats[deviceKey].runs.push(data);
-    deviceStats[deviceKey].totalRuns++;
-    deviceStats[deviceKey].apps.add(data.appName || "Unknown App");
-
-    if (data.avgFps) {
-      deviceStats[deviceKey].minFps = Math.min(
-        deviceStats[deviceKey].minFps,
-        data.avgFps
-      );
-      deviceStats[deviceKey].maxFps = Math.max(
-        deviceStats[deviceKey].maxFps,
-        data.avgFps
-      );
-    }
-  });
-
-  // Calculate averages
-  Object.values(deviceStats).forEach((device) => {
-    const totalFps = device.runs.reduce(
-      (sum, run) => sum + (run.avgFps || 0),
-      0
-    );
-    device.avgFps =
-      device.totalRuns > 0 ? (totalFps / device.totalRuns).toFixed(1) : 0;
-    if (device.minFps === Infinity) device.minFps = 0;
-    device.uniqueApps = device.apps.size;
-  });
-
-  // Sort by average FPS
-  const sortedDevices = Object.values(deviceStats).sort(
-    (a, b) => b.avgFps - a.avgFps
-  );
-
-  let html = `
-    <div style="margin-bottom: 20px;">
-      <h2 style="color: var(--text-primary); margin-bottom: 10px;">📱 All Devices Performance</h2>
-      <p style="color: var(--text-secondary);">Comprehensive performance analysis for all tested devices</p>
+  // Show loading state
+  container.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <div style="display: inline-block; width: 32px; height: 32px; border: 3px solid var(--primary-color); border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+      <div style="color: var(--text-secondary);">Loading devices data from Firebase...</div>
     </div>
-    <div style="display: grid; gap: 15px;">
   `;
 
-  sortedDevices.forEach((device, index) => {
-    const rank = index + 1;
-    const performanceClass =
-      device.avgFps >= 50 ? "excellent" : device.avgFps >= 30 ? "good" : "poor";
+  try {
+    // Load device collections from Firebase
+    const { firebaseService } = await import("./firebase-service.js");
+    const deviceCollections = await firebaseService.getAllDevices();
 
-    html += `
-      <div class="device-card" style="
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-      " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-          <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-              <span style="
+    if (deviceCollections.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No device data available</h3>
+          <p>Upload performance data to see device analysis here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Sort by total records (most tested devices first)
+    const sortedDevices = deviceCollections.sort(
+      (a, b) => b.totalRecords - a.totalRecords
+    );
+
+    let html = `
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: var(--text-primary); margin-bottom: 10px;">📱 All Devices Performance</h2>
+        <p style="color: var(--text-secondary);">Comprehensive performance analysis for all tested devices (${
+          sortedDevices.length
+        } devices, ${sortedDevices.reduce(
+      (sum, device) => sum + device.totalRecords,
+      0
+    )} total runs)</p>
+      </div>
+      <div style="display: grid; gap: 15px;">
+    `;
+
+    sortedDevices.forEach((device, index) => {
+      const rank = index + 1;
+
+      html += `
+        <div class="device-card" style="
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          padding: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+        " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <span style="
+                  background: var(--primary-color);
+                  color: white;
+                  padding: 4px 8px;
+                  border-radius: 12px;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                ">#${rank}</span>
+                <h3 style="color: var(--text-primary); margin: 0; font-size: 1.2rem; font-weight: 600;">
+                  📱 ${device.oemBrand}
+                </h3>
+              </div>
+              <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                Models: ${device.deviceModels.join(", ")}
+              </p>
+            </div>
+            <div style="text-align: right;">
+              <div style="
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+              ">
+                ${device.totalRecords}
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Total Runs</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
+                device.deviceModels.length
+              }</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Device Models</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
+                device.socModels.length
+              }</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">SoC Variants</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${new Date(
+                device.createdAt
+              ).toLocaleDateString()}</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">First Tested</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${new Date(
+                device.updatedAt
+              ).toLocaleDateString()}</div>
+              <div style="color: var(--text-secondary); font-size: 0.8rem;">Last Updated</div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 5px;">SoC Models:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${device.socModels
+                .map(
+                  (soc) => `
+                <span style="
+                  background: rgba(255, 255, 255, 0.1);
+                  color: var(--text-primary);
+                  padding: 2px 6px;
+                  border-radius: 8px;
+                  font-size: 0.7rem;
+                  font-weight: 500;
+                ">${soc}</span>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">
+              ${device.fpsDataReferences.length} Firebase Records
+            </span>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="filterByDeviceBrand('${
+                device.oemBrand
+              }')" style="
                 background: var(--primary-color);
                 color: white;
-                padding: 4px 8px;
-                border-radius: 12px;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
                 font-size: 0.8rem;
                 font-weight: 600;
-              ">#${rank}</span>
-              <h3 style="color: var(--text-primary); margin: 0; font-size: 1.2rem; font-weight: 600;">
-                📱 ${device.manufacturer} ${device.model}
-              </h3>
+                transition: all 0.2s ease;
+              " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
+                🔍 View Runs
+              </button>
+              <button onclick="viewDeviceDetails('${device.oemBrand}')" style="
+                background: var(--success-color);
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                font-weight: 600;
+                transition: all 0.2s ease;
+              " onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--success-color)'">
+                📊 Details
+              </button>
             </div>
-            <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
-              ${device.socModel} • Android ${device.androidVersion} • ${
-      device.totalMemoryGB
-    }GB RAM
-            </p>
-          </div>
-          <div style="text-align: right;">
-            <div style="
-              font-size: 1.5rem;
-              font-weight: bold;
-              color: ${
-                performanceClass === "excellent"
-                  ? "var(--success-color)"
-                  : performanceClass === "good"
-                  ? "var(--warning-color)"
-                  : "var(--error-color)"
-              };
-            ">
-              ${device.avgFps} FPS
-            </div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Average</div>
           </div>
         </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              device.totalRuns
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Total Runs</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              device.uniqueApps
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Apps Tested</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              device.minFps
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Min FPS</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem;">${
-              device.maxFps
-            }</div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">Max FPS</div>
-          </div>
-        </div>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-          <span style="color: var(--text-secondary); font-size: 0.8rem;">
-            SoC: ${device.socModel}
-          </span>
-          <button onclick="filterByDevice('${device.manufacturer}', '${
-      device.model
-    }')" style="
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-          " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">
-            🔍 View Runs
-          </button>
-        </div>
+      `;
+    });
+
+    html += "</div>";
+    container.innerHTML = html;
+  } catch (error) {
+    console.error("Error loading devices data:", error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Error loading devices data</h3>
+        <p>Failed to load data from Firebase. Please try again.</p>
+        <button onclick="updateDevicesView([])" style="
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 600;
+          margin-top: 10px;
+        ">Retry</button>
       </div>
     `;
-  });
-
-  html += "</div>";
-  container.innerHTML = html;
+  }
 }
 
 // Global filter functions
@@ -2922,6 +3167,39 @@ window.filterByDevice = function (manufacturer, model) {
     document.querySelector('[data-view="input-analysis"]').click();
     setTimeout(() => {
       dashboard.addFilter("manufacturer", manufacturer);
+    }, 100);
+  }
+};
+
+window.filterByDeviceBrand = function (oemBrand) {
+  const dashboard = window.dashboard;
+  if (dashboard) {
+    // Switch to input-analysis view and apply filter
+    document.querySelector('[data-view="input-analysis"]').click();
+    setTimeout(() => {
+      dashboard.addFilter("brand", oemBrand);
+    }, 100);
+  }
+};
+
+window.viewGameDetails = function (packageName) {
+  const dashboard = window.dashboard;
+  if (dashboard) {
+    // Switch to input-analysis view and apply filter
+    document.querySelector('[data-view="input-analysis"]').click();
+    setTimeout(() => {
+      dashboard.addFilter("packageName", packageName);
+    }, 100);
+  }
+};
+
+window.viewDeviceDetails = function (oemBrand) {
+  const dashboard = window.dashboard;
+  if (dashboard) {
+    // Switch to input-analysis view and apply filter
+    document.querySelector('[data-view="input-analysis"]').click();
+    setTimeout(() => {
+      dashboard.addFilter("brand", oemBrand);
     }, 100);
   }
 };
@@ -2968,7 +3246,7 @@ function editHotlist(hotlistId) {
     document.body.removeChild(modal);
   };
 
-  document.getElementById("saveEditHotlist").onclick = () => {
+  document.getElementById("saveEditHotlist").onclick = async () => {
     const name = document.getElementById("editHotlistName").value.trim();
     const description = document
       .getElementById("editHotlistDescription")
@@ -2980,7 +3258,7 @@ function editHotlist(hotlistId) {
     }
 
     try {
-      HotlistManager.updateHotlist(hotlistId, { name, description });
+      await HotlistManager.updateHotlist(hotlistId, { name, description });
       showToast("Hotlist updated successfully!", "success");
       updateHotlistsView(window.dashboard);
       document.body.removeChild(modal);
@@ -3819,6 +4097,268 @@ window.clearHotlistSelection = function () {
   updateHotlistSelection();
 };
 
+window.bulkEditHotlists = function () {
+  const checkedBoxes = document.querySelectorAll(".hotlist-checkbox:checked");
+  if (checkedBoxes.length === 0) {
+    showToast("No hotlists selected", "warning");
+    return;
+  }
+
+  const selectedHotlistIds = Array.from(checkedBoxes).map((checkbox) =>
+    checkbox.getAttribute("data-hotlist-id")
+  );
+
+  // Get the selected hotlists data
+  const dashboard = window.dashboard;
+  const selectedHotlists = selectedHotlistIds
+    .map((id) => HotlistManager.getHotlistById(id))
+    .filter(Boolean);
+
+  if (selectedHotlists.length === 0) {
+    showToast("Selected hotlists not found", "error");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: center; align-items: center; z-index: 3000;
+  `;
+
+  // Show current hotlists being edited
+  let hotlistsListHtml = selectedHotlists
+    .map(
+      (hotlist) => `
+      <div style="background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 10px; margin-bottom: 8px;">
+        <div style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem;">🏷️ ${
+          hotlist.name
+        }</div>
+        <div style="color: var(--text-secondary); font-size: 0.8rem;">${
+          hotlist.description || "No description"
+        }</div>
+        <div style="color: var(--text-secondary); font-size: 0.7rem; margin-top: 4px;">${
+          hotlist.runIds.length
+        } runs</div>
+      </div>
+    `
+    )
+    .join("");
+
+  modal.innerHTML = `
+    <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
+                 padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <h3 style="color: var(--text-primary); margin-top: 0;">Bulk Edit Hotlists</h3>
+      
+      <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 10px;">Selected Hotlists (${selectedHotlists.length}):</div>
+        <div style="max-height: 150px; overflow-y: auto;">
+          ${hotlistsListHtml}
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <h4 style="color: var(--text-primary); margin-bottom: 15px;">Edit Options:</h4>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="bulkEditNames" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+            <span style="color: var(--text-primary); font-weight: 500;">Update Names (add prefix/suffix)</span>
+          </label>
+          <div id="nameEditOptions" style="display: none; margin-top: 10px; margin-left: 24px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+              <input type="text" id="namePrefix" placeholder="Prefix" style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem;" />
+              <input type="text" id="nameSuffix" placeholder="Suffix" style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem;" />
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="bulkEditDescriptions" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+            <span style="color: var(--text-primary); font-weight: 500;">Update Descriptions</span>
+          </label>
+          <div id="descriptionEditOptions" style="display: none; margin-top: 10px; margin-left: 24px;">
+            <div style="margin-bottom: 8px;">
+              <label style="display: block; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 4px;">Action:</label>
+              <select id="descriptionAction" style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem;">
+                <option value="replace">Replace all descriptions</option>
+                <option value="append">Append to existing descriptions</option>
+                <option value="prepend">Prepend to existing descriptions</option>
+              </select>
+            </div>
+            <textarea id="newDescription" placeholder="Enter new description text" style="width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem; min-height: 60px; resize: vertical; box-sizing: border-box;"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="bulkMergeHotlists" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+            <span style="color: var(--text-primary); font-weight: 500;">Merge all selected hotlists into one</span>
+          </label>
+          <div id="mergeOptions" style="display: none; margin-top: 10px; margin-left: 24px;">
+            <input type="text" id="mergedHotlistName" placeholder="Name for merged hotlist" style="width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem; margin-bottom: 8px; box-sizing: border-box;" />
+            <textarea id="mergedHotlistDescription" placeholder="Description for merged hotlist" style="width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-size: 0.85rem; min-height: 50px; resize: vertical; box-sizing: border-box;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="cancelBulkEdit" style="padding: 10px 20px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer;">Cancel</button>
+        <button id="saveBulkEdit" style="padding: 10px 20px; border-radius: var(--btn-radius); border: none; background: var(--primary-color); color: white; cursor: pointer;">Apply Changes</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Set up event listeners for showing/hiding options
+  document.getElementById("bulkEditNames").onchange = function () {
+    document.getElementById("nameEditOptions").style.display = this.checked
+      ? "block"
+      : "none";
+  };
+
+  document.getElementById("bulkEditDescriptions").onchange = function () {
+    document.getElementById("descriptionEditOptions").style.display = this
+      .checked
+      ? "block"
+      : "none";
+  };
+
+  document.getElementById("bulkMergeHotlists").onchange = function () {
+    document.getElementById("mergeOptions").style.display = this.checked
+      ? "block"
+      : "none";
+    // Disable other options when merge is selected
+    const nameCheckbox = document.getElementById("bulkEditNames");
+    const descCheckbox = document.getElementById("bulkEditDescriptions");
+    if (this.checked) {
+      nameCheckbox.disabled = true;
+      descCheckbox.disabled = true;
+      nameCheckbox.checked = false;
+      descCheckbox.checked = false;
+      document.getElementById("nameEditOptions").style.display = "none";
+      document.getElementById("descriptionEditOptions").style.display = "none";
+    } else {
+      nameCheckbox.disabled = false;
+      descCheckbox.disabled = false;
+    }
+  };
+
+  document.getElementById("cancelBulkEdit").onclick = () => {
+    document.body.removeChild(modal);
+  };
+
+  document.getElementById("saveBulkEdit").onclick = async () => {
+    const editNames = document.getElementById("bulkEditNames").checked;
+    const editDescriptions = document.getElementById(
+      "bulkEditDescriptions"
+    ).checked;
+    const mergeHotlists = document.getElementById("bulkMergeHotlists").checked;
+
+    if (!editNames && !editDescriptions && !mergeHotlists) {
+      showToast("Please select at least one edit option", "warning");
+      return;
+    }
+
+    try {
+      if (mergeHotlists) {
+        // Merge hotlists
+        const mergedName = document
+          .getElementById("mergedHotlistName")
+          .value.trim();
+        const mergedDescription = document
+          .getElementById("mergedHotlistDescription")
+          .value.trim();
+
+        if (!mergedName) {
+          showToast("Please enter a name for the merged hotlist", "warning");
+          return;
+        }
+
+        // Collect all run IDs from selected hotlists
+        const allRunIds = new Set();
+        selectedHotlists.forEach((hotlist) => {
+          hotlist.runIds.forEach((runId) => allRunIds.add(runId));
+        });
+
+        // Create new merged hotlist
+        const mergedHotlist = await dashboard.createHotlist(
+          mergedName,
+          mergedDescription
+        );
+
+        // Add all runs to the new hotlist
+        for (const runId of allRunIds) {
+          await dashboard.addRunToHotlist(mergedHotlist.id, runId);
+        }
+
+        // Delete original hotlists
+        for (const hotlist of selectedHotlists) {
+          await dashboard.deleteHotlist(hotlist.id);
+        }
+
+        showToast(
+          `Successfully merged ${selectedHotlists.length} hotlists into "${mergedName}"`,
+          "success"
+        );
+      } else {
+        // Individual edits
+        let updatedCount = 0;
+
+        for (const hotlist of selectedHotlists) {
+          const updates = {};
+
+          if (editNames) {
+            const prefix = document.getElementById("namePrefix").value.trim();
+            const suffix = document.getElementById("nameSuffix").value.trim();
+            updates.name = `${prefix}${hotlist.name}${suffix}`;
+          }
+
+          if (editDescriptions) {
+            const action = document.getElementById("descriptionAction").value;
+            const newDesc = document
+              .getElementById("newDescription")
+              .value.trim();
+
+            if (newDesc) {
+              switch (action) {
+                case "replace":
+                  updates.description = newDesc;
+                  break;
+                case "append":
+                  updates.description = `${
+                    hotlist.description || ""
+                  } ${newDesc}`.trim();
+                  break;
+                case "prepend":
+                  updates.description = `${newDesc} ${
+                    hotlist.description || ""
+                  }`.trim();
+                  break;
+              }
+            }
+          }
+
+          if (Object.keys(updates).length > 0) {
+            await HotlistManager.updateHotlist(hotlist.id, updates);
+            updatedCount++;
+          }
+        }
+
+        showToast(`Successfully updated ${updatedCount} hotlists`, "success");
+      }
+
+      document.body.removeChild(modal);
+      clearHotlistSelection();
+      updateHotlistsView(dashboard);
+    } catch (error) {
+      console.error("Bulk edit error:", error);
+      showToast("Failed to apply bulk edits", "error");
+    }
+  };
+};
+
 window.bulkDeleteHotlists = function () {
   const checkedBoxes = document.querySelectorAll(".hotlist-checkbox:checked");
   if (checkedBoxes.length === 0) {
@@ -3851,6 +4391,425 @@ window.bulkDeleteHotlists = function () {
     clearHotlistSelection();
   }
 };
+
+// --- Selection Details Modal Functions ---
+
+export function openSelectionDetailsModal() {
+  const dashboard = window.dashboard;
+  if (!dashboard || dashboard.selectedForComparison.size === 0) {
+    showToast("No items selected", "warning");
+    return;
+  }
+
+  const modal = document.getElementById("selectionDetailsModal");
+  const selectedData = Array.from(dashboard.selectedForComparison).map(
+    (index) => dashboard.uploadedData[index]
+  );
+
+  // Update count
+  document.getElementById("selectionDetailsCount").textContent =
+    selectedData.length;
+
+  // Populate selected items list
+  populateSelectionDetailsList(selectedData, dashboard);
+
+  // Set up event listeners
+  setupSelectionDetailsEventListeners(dashboard);
+
+  modal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function populateSelectionDetailsList(selectedData, dashboard) {
+  const container = document.getElementById("selectionDetailsList");
+
+  let html = "";
+  selectedData.forEach((data, index) => {
+    const actualIndex = dashboard.uploadedData.indexOf(data);
+    const deviceInfo = data.deviceInfo || {};
+    const device = `${deviceInfo["ro.product.manufacturer"] || "Unknown"} ${
+      deviceInfo["ro.product.model"] || "Unknown"
+    }`;
+    const oemBrand =
+      deviceInfo["ro.oem.brand"] ||
+      deviceInfo["ro.product.manufacturer"] ||
+      "Unknown";
+
+    html += `
+      <div class="selected-item-card" style="
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="font-size: 1.2rem;">📱</span>
+              <div>
+                <div style="color: var(--text-primary); font-weight: 600; font-size: 1rem;">
+                  ${data.appName || "Unknown App"}
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                  ${data.packageName || "Unknown Package"}
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 10px;">
+              <div>
+                <div style="color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Avg FPS</div>
+                <div style="color: var(--primary-light); font-weight: 600; font-size: 0.9rem;">${
+                  data.avgFps ? data.avgFps.toFixed(1) : "N/A"
+                }</div>
+              </div>
+              <div>
+                <div style="color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Duration</div>
+                <div style="color: var(--text-primary); font-weight: 500; font-size: 0.9rem;">${
+                  data.elapsedTimeSeconds
+                    ? data.elapsedTimeSeconds.toFixed(1) + "s"
+                    : "N/A"
+                }</div>
+              </div>
+              <div>
+                <div style="color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Device Brand</div>
+                <div style="color: var(--text-primary); font-weight: 500; font-size: 0.9rem;">${oemBrand}</div>
+              </div>
+            </div>
+            
+            <div style="color: var(--text-secondary); font-size: 0.8rem;">
+              <strong>Device:</strong> ${device}
+            </div>
+          </div>
+          
+          <button onclick="removeFromSelectionDetails(${actualIndex})" style="
+            background: var(--error-color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-left: 15px;
+          " onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='var(--error-color)'" title="Remove from selection">
+            ✕ Remove
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  if (html === "") {
+    html = `
+      <div class="empty-state">
+        <h3>No items selected</h3>
+        <p>Select items from the main table to see them here.</p>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+function setupSelectionDetailsEventListeners(dashboard) {
+  // Close button
+  const closeBtn = document.getElementById("closeSelectionDetailsBtn");
+  closeBtn.onclick = closeSelectionDetailsModal;
+
+  // Clear all selection
+  const clearAllBtn = document.getElementById("clearAllSelectionBtn");
+  clearAllBtn.onclick = () => {
+    dashboard.selectedForComparison.clear();
+    updateCompareControls(dashboard);
+    closeSelectionDetailsModal();
+    showToast("Selection cleared", "info");
+  };
+
+  // Bulk delete
+  const bulkDeleteBtn = document.getElementById("bulkDeleteFromSelectionBtn");
+  bulkDeleteBtn.onclick = () => deleteSelectedItems();
+
+  // Compare selected from modal
+  const compareBtn = document.getElementById("compareSelectedFromModal");
+  compareBtn.onclick = () => {
+    if (dashboard.selectedForComparison.size >= 2) {
+      closeSelectionDetailsModal();
+      openComparisonModal(dashboard);
+    } else {
+      showToast("Please select at least 2 items to compare", "warning");
+    }
+  };
+
+  // Export selected data
+  const exportBtn = document.getElementById("exportSelectedData");
+  exportBtn.onclick = () => exportSelectedData(dashboard);
+
+  // Add to hotlist bulk
+  const hotlistBtn = document.getElementById("addToHotlistBulk");
+  hotlistBtn.onclick = () => addSelectedToHotlistBulk(dashboard);
+}
+
+function closeSelectionDetailsModal() {
+  const modal = document.getElementById("selectionDetailsModal");
+  modal.classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+// Global function to remove item from selection details
+window.removeFromSelectionDetails = function (index) {
+  const dashboard = window.dashboard;
+  if (dashboard) {
+    dashboard.selectedForComparison.delete(index);
+    updateCompareControls(dashboard);
+
+    // Update the modal content
+    if (dashboard.selectedForComparison.size === 0) {
+      closeSelectionDetailsModal();
+    } else {
+      const selectedData = Array.from(dashboard.selectedForComparison).map(
+        (idx) => dashboard.uploadedData[idx]
+      );
+      document.getElementById("selectionDetailsCount").textContent =
+        selectedData.length;
+      populateSelectionDetailsList(selectedData, dashboard);
+    }
+
+    showToast("Item removed from selection", "info");
+  }
+};
+
+// Global function to delete selected items
+window.deleteSelectedItems = async function () {
+  const dashboard = window.dashboard;
+  if (!dashboard || dashboard.selectedForComparison.size === 0) {
+    showToast("No items selected for deletion", "warning");
+    return;
+  }
+
+  // Check authentication ONCE for bulk operation
+  if (!dashboard.isAuthenticated) {
+    const authenticated = await showAuthenticationModal(dashboard);
+    if (!authenticated) {
+      return;
+    }
+  }
+
+  const selectedIndices = Array.from(dashboard.selectedForComparison).sort(
+    (a, b) => b - a
+  ); // Sort in descending order
+  const itemCount = selectedIndices.length;
+
+  if (
+    !confirm(
+      `Are you sure you want to delete ${itemCount} selected item${
+        itemCount > 1 ? "s" : ""
+      }? This action cannot be undone.`
+    )
+  ) {
+    return;
+  }
+
+  try {
+    dashboard.showLoading();
+
+    // Delete items in reverse order to maintain correct indices
+    // Use the bulk delete method to avoid individual confirmations
+    for (const index of selectedIndices) {
+      // Call the internal delete method directly without authentication checks
+      await dashboard.deleteAnalysisResultInternal(index);
+    }
+
+    // Clear selection
+    dashboard.selectedForComparison.clear();
+    updateCompareControls(dashboard);
+
+    // Close modal if open
+    const modal = document.getElementById("selectionDetailsModal");
+    if (modal.classList.contains("show")) {
+      closeSelectionDetailsModal();
+    }
+
+    showToast(
+      `Successfully deleted ${itemCount} item${itemCount > 1 ? "s" : ""}`,
+      "success"
+    );
+  } catch (error) {
+    console.error("Error deleting selected items:", error);
+    showToast("Failed to delete some items", "error");
+  } finally {
+    dashboard.hideLoading();
+  }
+};
+
+function exportSelectedData(dashboard) {
+  const selectedData = Array.from(dashboard.selectedForComparison).map(
+    (index) => dashboard.uploadedData[index]
+  );
+
+  if (selectedData.length === 0) {
+    showToast("No items selected for export", "warning");
+    return;
+  }
+
+  try {
+    const dataStr = JSON.stringify(selectedData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `selected-fps-data-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast(`Exported ${selectedData.length} selected items`, "success");
+  } catch (error) {
+    console.error("Export error:", error);
+    showToast("Failed to export selected data", "error");
+  }
+}
+
+function addSelectedToHotlistBulk(dashboard) {
+  const selectedIndices = Array.from(dashboard.selectedForComparison);
+
+  if (selectedIndices.length === 0) {
+    showToast("No items selected", "warning");
+    return;
+  }
+
+  const allHotlists = dashboard.getAllHotlists();
+
+  if (allHotlists.length === 0) {
+    showToast("No hotlists available. Create a hotlist first.", "warning");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+    display: flex; justify-content: center; align-items: center; z-index: 3500;
+  `;
+
+  let hotlistsHtml = allHotlists
+    .map(
+      (hotlist) => `
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); margin-bottom: 10px;">
+        <input type="checkbox" id="bulk_hotlist_${
+          hotlist.id
+        }" style="width: 16px; height: 16px; accent-color: var(--primary-color);" />
+        <label for="bulk_hotlist_${
+          hotlist.id
+        }" style="flex: 1; color: var(--text-primary); cursor: pointer;">
+          <strong>🏷️ ${hotlist.name}</strong>
+          ${
+            hotlist.description
+              ? `<br><span style="color: var(--text-secondary); font-size: 0.8rem;">${hotlist.description}</span>`
+              : ""
+          }
+        </label>
+      </div>
+    `
+    )
+    .join("");
+
+  modal.innerHTML = `
+    <div style="background: var(--card-bg); border-radius: var(--card-radius); border: var(--glass-border); backdrop-filter: blur(var(--glass-blur));
+                 padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+      <h3 style="color: var(--text-primary); margin-top: 0;">Add Selected Items to Hotlists</h3>
+      <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 5px;">Selected Items:</div>
+        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+          ${selectedIndices.length} items selected for hotlist assignment
+        </div>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <h4 style="color: var(--text-primary); margin-bottom: 15px;">Select Hotlists:</h4>
+        ${hotlistsHtml}
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="cancelBulkHotlistAssignment" style="padding: 10px 20px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer;">Cancel</button>
+        <button id="saveBulkHotlistAssignment" style="padding: 10px 20px; border-radius: var(--btn-radius); border: none; background: var(--primary-color); color: white; cursor: pointer;">Add to Selected Hotlists</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelBulkHotlistAssignment").onclick = () => {
+    document.body.removeChild(modal);
+  };
+
+  document.getElementById("saveBulkHotlistAssignment").onclick = () => {
+    const selectedHotlists = [];
+    allHotlists.forEach((hotlist) => {
+      const checkbox = document.getElementById(`bulk_hotlist_${hotlist.id}`);
+      if (checkbox && checkbox.checked) {
+        selectedHotlists.push(hotlist.id);
+      }
+    });
+
+    if (selectedHotlists.length === 0) {
+      showToast("Please select at least one hotlist", "warning");
+      return;
+    }
+
+    // Assign selected hotlists to all selected runs
+    let assignmentCount = 0;
+    selectedIndices.forEach((runIndex) => {
+      selectedHotlists.forEach((hotlistId) => {
+        dashboard.addRunToHotlist(hotlistId, runIndex);
+        assignmentCount++;
+      });
+    });
+
+    showToast(
+      `Successfully assigned ${selectedHotlists.length} hotlists to ${selectedIndices.length} items!`,
+      "success"
+    );
+    document.body.removeChild(modal);
+  };
+}
+
+// Global function to toggle all selection
+window.toggleAllSelection = function (checked) {
+  const dashboard = window.dashboard;
+  if (!dashboard) return;
+
+  const checkboxes = document.querySelectorAll(".compare-checkbox");
+
+  checkboxes.forEach((checkbox) => {
+    const index = parseInt(checkbox.getAttribute("onchange").match(/\d+/)[0]);
+
+    if (checked) {
+      dashboard.selectedForComparison.add(index);
+      checkbox.checked = true;
+    } else {
+      dashboard.selectedForComparison.delete(index);
+      checkbox.checked = false;
+    }
+  });
+
+  updateCompareControls(dashboard);
+
+  const selectedCount = dashboard.selectedForComparison.size;
+  if (selectedCount > 0) {
+    showToast(
+      `${selectedCount} items ${checked ? "selected" : "deselected"}`,
+      "info"
+    );
+  }
+};
+
+// Global function to open selection details modal
+window.openSelectionDetailsModal = openSelectionDetailsModal;
 
 // Global Firebase functions
 window.syncSingleRecord = async function (index) {

@@ -1,0 +1,3908 @@
+{
+  "collections": {
+    "fps_data": {
+      "name": "fps_data",
+      "documentCount": 10,
+      "fields": {
+        "avgFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            39.35,
+            51.87,
+            42.59
+          ],
+          "nested": false
+        },
+        "jankInstabilityPercentage": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            24.6,
+            30,
+            30.7
+          ],
+          "nested": false
+        },
+        "perFrameSlowFrameExcess": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              "... 1521 more items"
+            ],
+            [
+              0,
+              0,
+              0.8,
+              0,
+              0,
+              "... 1156 more items"
+            ],
+            [
+              0.08,
+              0,
+              0.08,
+              0,
+              0,
+              "... 1409 more items"
+            ]
+          ],
+          "nested": false
+        },
+        "timestamp": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "10/08/2025, 01:26:58",
+            "10/08/2025, 01:27:03",
+            "10/08/2025, 01:26:51"
+          ],
+          "nested": false
+        },
+        "targetFPS": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            30,
+            30,
+            30
+          ],
+          "nested": false
+        },
+        "deviceInfo": {
+          "type": "object",
+          "occurrences": 10,
+          "examples": [
+            {
+              "ro.product.cpu.abilist64": "x86_64,arm64-v8a",
+              "ro.oem.brand": "omnigul",
+              "ro.build.fingerprint": "google/brya/brya_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.kernel.version": "5.10",
+              "ro.build.version.release_or_codename": "13",
+              "appName": "Unknown App",
+              "ro.product.cpu.abi": "x86_64",
+              "ro.product.manufacturer": "Google",
+              "ro.soc.model": "i3-1315U",
+              "ro.product.cpu.abilist32": "",
+              "ro.hardware.egl": "angle",
+              "ro.build.version.release": "13",
+              "ro.serialno": "450C1D3FE3F3477DAE7A",
+              "ro.opengles.version": "196609",
+              "ro.product.model": "brya",
+              "ro.soc.manufacturer": "Intel",
+              "MemTotal": "7158436 kB",
+              "appVersion": "0.0.14742",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.hwui.use_vulkan": "true",
+              "dalvik.vm.heapsize": "512m",
+              "ro.lmk.use_psi": "true",
+              "ro.build.version.sdk": "33",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.product.board": "omnigul",
+              "ro.hardware.vulkan": "cheets"
+            },
+            {
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.product.manufacturer": "Google",
+              "ro.build.version.release": "13",
+              "ro.product.model": "corsola",
+              "ro.hwui.use_vulkan": "true",
+              "ro.serialno": "54B9ADFED6ADD0B686FB",
+              "ro.hardware.egl": "angle",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.opengles.version": "196609",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.build.version.sdk": "33",
+              "ro.soc.model": "Kompanio 520 MT8186",
+              "ro.product.board": "veluza",
+              "ro.build.fingerprint": "google/corsola/corsola_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.product.cpu.abilist32": "",
+              "ro.build.version.release_or_codename": "13",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.soc.manufacturer": "Mediatek",
+              "appVersion": "0.0.14742",
+              "appName": "Unknown App",
+              "dalvik.vm.heapsize": "512m",
+              "MemTotal": "7324964 kB",
+              "ro.hardware.vulkan": "cheets",
+              "ro.lmk.use_psi": "true",
+              "ro.oem.brand": "veluza",
+              "ro.kernel.version": "5.10",
+              "dalvik.vm.heapgrowthlimit": "192m"
+            },
+            {
+              "ro.product.cpu.abilist32": "",
+              "appName": "Unknown App",
+              "ro.hardware.egl": "mesa",
+              "ro.oem.brand": "lazor",
+              "ro.soc.manufacturer": "Qualcomm",
+              "ro.kernel.version": "5.10",
+              "ro.hardware.vulkan": "cheets",
+              "ro.product.board": "lazor",
+              "ro.lmk.use_psi": "true",
+              "ro.product.manufacturer": "Google",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.build.version.release": "13",
+              "dalvik.vm.heapsize": "512m",
+              "ro.build.version.release_or_codename": "13",
+              "appVersion": "0.0.14742",
+              "ro.build.version.sdk": "33",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.build.fingerprint": "google/trogdor/trogdor_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.opengles.version": "196610",
+              "ro.serialno": "C158DFC5642DACFC02C9",
+              "ro.product.model": "trogdor",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.soc.model": "SC7180",
+              "MemTotal": "7199260 kB",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hwui.use_vulkan": "true"
+            }
+          ],
+          "nested": true
+        },
+        "deviceInfo.ro.product.cpu.abilist64": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "x86_64,arm64-v8a",
+            "arm64-v8a",
+            "arm64-v8a"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.oem.brand": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "omnigul",
+            "veluza",
+            "lazor"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.build.fingerprint": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "google/brya/brya_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+            "google/corsola/corsola_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+            "google/trogdor/trogdor_cheets:13/R138-16295.54.0/13763204:user/release-keys"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.kernel.version": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "5.10",
+            "5.10",
+            "5.10"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.build.version.release_or_codename": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "13",
+            "13",
+            "13"
+          ],
+          "nested": false
+        },
+        "deviceInfo.appName": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Unknown App",
+            "Unknown App",
+            "Unknown App"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.cpu.abi": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "x86_64",
+            "arm64-v8a",
+            "arm64-v8a"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.manufacturer": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Google",
+            "Google",
+            "Google"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.soc.model": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "i3-1315U",
+            "Kompanio 520 MT8186",
+            "SC7180"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.cpu.abilist32": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "",
+            "",
+            ""
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.hardware.egl": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "angle",
+            "angle",
+            "mesa"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.build.version.release": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "13",
+            "13",
+            "13"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.serialno": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "450C1D3FE3F3477DAE7A",
+            "54B9ADFED6ADD0B686FB",
+            "C158DFC5642DACFC02C9"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.opengles.version": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "196609",
+            "196609",
+            "196610"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.model": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "brya",
+            "corsola",
+            "trogdor"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.soc.manufacturer": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Intel",
+            "Mediatek",
+            "Qualcomm"
+          ],
+          "nested": false
+        },
+        "deviceInfo.MemTotal": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "7158436 kB",
+            "7324964 kB",
+            "7199260 kB"
+          ],
+          "nested": false
+        },
+        "deviceInfo.appVersion": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "0.0.14742",
+            "0.0.14742",
+            "0.0.14742"
+          ],
+          "nested": false
+        },
+        "deviceInfo.dalvik.vm.heapgrowthlimit": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "192m",
+            "192m",
+            "192m"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.hwui.use_vulkan": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "true",
+            "true",
+            "true"
+          ],
+          "nested": false
+        },
+        "deviceInfo.dalvik.vm.heapsize": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "512m",
+            "512m",
+            "512m"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.lmk.use_psi": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "true",
+            "true",
+            "true"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.build.version.sdk": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "33",
+            "33",
+            "33"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.build.version.release_or_preview_display": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "13",
+            "13",
+            "13"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.cpu.abilist": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "x86_64,arm64-v8a",
+            "arm64-v8a",
+            "arm64-v8a"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.hardware.gralloc": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "minigbm_arcvm",
+            "minigbm_arcvm",
+            "minigbm_arcvm"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.product.board": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "omnigul",
+            "veluza",
+            "lazor"
+          ],
+          "nested": false
+        },
+        "deviceInfo.ro.hardware.vulkan": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "cheets",
+            "cheets",
+            "cheets"
+          ],
+          "nested": false
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "occurrences": 10,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:26:58.894Z]",
+            "[Timestamp: 2025-08-10T08:27:03.984Z]",
+            "[Timestamp: 2025-08-10T08:26:51.484Z]"
+          ],
+          "nested": false
+        },
+        "avgJankInstability": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            22.03,
+            21.4,
+            20.27
+          ],
+          "nested": false
+        },
+        "rawFpsData": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              {
+                "fenceTime": 19470741388058,
+                "instantFps": 30.03,
+                "latency": 14.04,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "vsyncTime": 19470727352283,
+                "presentationTime": 19470767515484,
+                "deltaTime": 33.3
+              },
+              {
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "fenceTime": 19470788319810,
+                "vsyncTime": 19470775054895,
+                "latency": 13.26,
+                "presentationTime": 19470817487486,
+                "instantFps": 20.01,
+                "deltaTime": 49.97
+              },
+              {
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "latency": 13.08,
+                "deltaTime": 16.72,
+                "presentationTime": 19470834205383,
+                "fenceTime": 19470807213106,
+                "vsyncTime": 19470794136700,
+                "instantFps": 59.82
+              },
+              {
+                "vsyncTime": 19470819737626,
+                "presentationTime": 19470850844906,
+                "latency": 13.64,
+                "deltaTime": 16.64,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "instantFps": 60.1,
+                "fenceTime": 19470833379160
+              },
+              {
+                "fenceTime": 19470867625558,
+                "vsyncTime": 19470854487626,
+                "presentationTime": 19470884184531,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "instantFps": 29.99,
+                "deltaTime": 33.34,
+                "latency": 13.14
+              },
+              "... 1522 more items"
+            ],
+            [
+              {
+                "vsyncTime": 1701089942253,
+                "deltaTime": 33.32,
+                "presentationTime": 1701132491484,
+                "instantFps": 30.01,
+                "latency": 15.29,
+                "fenceTime": 1701105231869,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "vsyncTime": 1701125025945,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327",
+                "fenceTime": 1701142169407,
+                "deltaTime": 33.68,
+                "instantFps": 29.69,
+                "presentationTime": 1701166168945,
+                "latency": 17.14
+              },
+              {
+                "latency": 16.85,
+                "vsyncTime": 1701169852022,
+                "presentationTime": 1701215926407,
+                "instantFps": 20.1,
+                "deltaTime": 49.76,
+                "fenceTime": 1701186705561,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "instantFps": 19.69,
+                "vsyncTime": 1701228274022,
+                "presentationTime": 1701266721407,
+                "fenceTime": 1701244611099,
+                "latency": 16.34,
+                "deltaTime": 50.8,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "presentationTime": 1701299232407,
+                "deltaTime": 32.51,
+                "vsyncTime": 1701258793869,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327",
+                "fenceTime": 1701275205330,
+                "latency": 16.41,
+                "instantFps": 30.76
+              },
+              "... 1157 more items"
+            ],
+            [
+              {
+                "instantFps": 20.05,
+                "vsyncTime": 81327543464132,
+                "presentationTime": 81327602047830,
+                "latency": 35.77,
+                "deltaTime": 49.87,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "fenceTime": 81327579231059
+              },
+              {
+                "deltaTime": 50.08,
+                "fenceTime": 81327621683403,
+                "latency": 35.8,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "vsyncTime": 81327585887986,
+                "instantFps": 19.97,
+                "presentationTime": 81327652130382
+              },
+              {
+                "latency": 33.31,
+                "vsyncTime": 81327632787882,
+                "presentationTime": 81327685352830,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "deltaTime": 33.22,
+                "fenceTime": 81327666096163,
+                "instantFps": 30.1
+              },
+              {
+                "vsyncTime": 81327673989340,
+                "instantFps": 19.97,
+                "presentationTime": 81327735430330,
+                "fenceTime": 81327708309496,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "latency": 34.32,
+                "deltaTime": 50.08
+              },
+              {
+                "vsyncTime": 81327714546267,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "instantFps": 29.98,
+                "fenceTime": 81327748500642,
+                "deltaTime": 33.36,
+                "presentationTime": 81327768786267,
+                "latency": 33.95
+              },
+              "... 1410 more items"
+            ]
+          ],
+          "nested": false
+        },
+        "vsync_avgFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            27.61,
+            20.36,
+            24.66
+          ],
+          "nested": false
+        },
+        "perFrameInstantaneousFps": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              20.01,
+              59.82,
+              60.1,
+              29.99,
+              20.01,
+              "... 1521 more items"
+            ],
+            [
+              29.69,
+              20.1,
+              19.69,
+              30.76,
+              30.14,
+              "... 1156 more items"
+            ],
+            [
+              19.97,
+              30.1,
+              19.97,
+              29.98,
+              20.05,
+              "... 1409 more items"
+            ]
+          ],
+          "nested": false
+        },
+        "vsync_maxFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            72.62,
+            66.36,
+            160.45
+          ],
+          "nested": false
+        },
+        "slowFramePercentage": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            9.7,
+            48.4,
+            23.3
+          ],
+          "nested": false
+        },
+        "maxJankInstability": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            133.85,
+            100.45,
+            267.4
+          ],
+          "nested": false
+        },
+        "perFrameInstability": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              0,
+              0,
+              0,
+              16.7,
+              16.64,
+              "... 1521 more items"
+            ],
+            [
+              0,
+              16.08,
+              0,
+              0,
+              0,
+              "... 1156 more items"
+            ],
+            [
+              0,
+              0,
+              16.86,
+              0,
+              16.53,
+              "... 1409 more items"
+            ]
+          ],
+          "nested": false
+        },
+        "targetFpsScore": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            51.8565815324165,
+            98.81239242685027,
+            53.113074204947
+          ],
+          "nested": false
+        },
+        "maxFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            61.12,
+            63.94,
+            62.79
+          ],
+          "nested": false
+        },
+        "minFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            4.28,
+            6,
+            3.33
+          ],
+          "nested": false
+        },
+        "slowFramesCount": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            148,
+            562,
+            330
+          ],
+          "nested": false
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "occurrences": 10,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:26:58.894Z]",
+            "[Timestamp: 2025-08-10T08:27:03.984Z]",
+            "[Timestamp: 2025-08-10T08:26:51.484Z]"
+          ],
+          "nested": false
+        },
+        "minFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            16.36,
+            15.64,
+            15.93
+          ],
+          "nested": false
+        },
+        "refreshRate": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            60,
+            60,
+            60
+          ],
+          "nested": false
+        },
+        "vsync_minFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            4.47,
+            6.72,
+            3.27
+          ],
+          "nested": false
+        },
+        "choppinessRating": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Choppy",
+            "Choppy",
+            "Choppy"
+          ],
+          "nested": false
+        },
+        "jankInstabilityCount": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            376,
+            348,
+            434
+          ],
+          "nested": false
+        },
+        "fileName": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Upload 12",
+            "Upload 15",
+            "Upload 8"
+          ],
+          "nested": false
+        },
+        "avgSlowFrameExcess": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            23.44,
+            11.94,
+            5.1
+          ],
+          "nested": false
+        },
+        "fpsBuckets": {
+          "type": "object",
+          "occurrences": 10,
+          "examples": [
+            {
+              "bucket_70_plus": 127,
+              "bucket_0_3": 0,
+              "bucket_50_70": 0,
+              "bucket_5_7": 1,
+              "endBattery": 1438,
+              "bucket_19_22": 0,
+              "refreshRate": 99,
+              "bucket_9_11": 11,
+              "bucket_11_13": 14,
+              "bucket_26_35": 0,
+              "bucket_13_16": 20,
+              "elapsedTime": 1528,
+              "bucket_3_5": 0,
+              "bucket_22_26": 381,
+              "bucket_7_9": 4,
+              "batteryDrain": 98,
+              "bucket_35_50": 929,
+              "bucket_16_19": 40,
+              "totalFrames": 28,
+              "startBattery": 60,
+              "avgFps": 0
+            },
+            {
+              "bucket_22_26": 597,
+              "bucket_35_50": 246,
+              "bucket_0_3": 0,
+              "avgFps": 0,
+              "totalFrames": 21,
+              "bucket_11_13": 9,
+              "startBattery": 60,
+              "bucket_70_plus": 11,
+              "bucket_7_9": 4,
+              "bucket_3_5": 0,
+              "bucket_5_7": 0,
+              "bucket_50_70": 0,
+              "bucket_16_19": 260,
+              "elapsedTime": 1163,
+              "bucket_26_35": 0,
+              "batteryDrain": 100,
+              "refreshRate": 100,
+              "bucket_19_22": 2,
+              "bucket_13_16": 25,
+              "bucket_9_11": 8,
+              "endBattery": 1157
+            },
+            {
+              "bucket_0_3": 0,
+              "bucket_19_22": 2,
+              "bucket_26_35": 1,
+              "avgFps": 0,
+              "bucket_35_50": 578,
+              "batteryDrain": 91,
+              "bucket_11_13": 3,
+              "bucket_5_7": 1,
+              "bucket_3_5": 0,
+              "refreshRate": 91,
+              "bucket_50_70": 1,
+              "bucket_16_19": 28,
+              "bucket_13_16": 10,
+              "bucket_22_26": 714,
+              "startBattery": 60,
+              "endBattery": 1387,
+              "bucket_70_plus": 73,
+              "bucket_9_11": 2,
+              "bucket_7_9": 2,
+              "totalFrames": 25,
+              "elapsedTime": 1416
+            }
+          ],
+          "nested": true
+        },
+        "fpsBuckets.bucket_70_plus": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            127,
+            11,
+            73
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_0_3": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            0,
+            0
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_50_70": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            0,
+            1
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_5_7": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            1,
+            0,
+            1
+          ],
+          "nested": false
+        },
+        "fpsBuckets.endBattery": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            1438,
+            1157,
+            1387
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_19_22": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            2,
+            2
+          ],
+          "nested": false
+        },
+        "fpsBuckets.refreshRate": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            99,
+            100,
+            91
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_9_11": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            11,
+            8,
+            2
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_11_13": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            14,
+            9,
+            3
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_26_35": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            0,
+            1
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_13_16": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            20,
+            25,
+            10
+          ],
+          "nested": false
+        },
+        "fpsBuckets.elapsedTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            1528,
+            1163,
+            1416
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_3_5": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            0,
+            0
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_22_26": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            381,
+            597,
+            714
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_7_9": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            4,
+            4,
+            2
+          ],
+          "nested": false
+        },
+        "fpsBuckets.batteryDrain": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            98,
+            100,
+            91
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_35_50": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            929,
+            246,
+            578
+          ],
+          "nested": false
+        },
+        "fpsBuckets.bucket_16_19": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            40,
+            260,
+            28
+          ],
+          "nested": false
+        },
+        "fpsBuckets.totalFrames": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            28,
+            21,
+            25
+          ],
+          "nested": false
+        },
+        "fpsBuckets.startBattery": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            60,
+            60,
+            60
+          ],
+          "nested": false
+        },
+        "fpsBuckets.avgFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            0,
+            0,
+            0
+          ],
+          "nested": false
+        },
+        "appName": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Omnigul Keyboard Steppingstone",
+            "Veluza Keyboard Redlightgreenlight",
+            "Lazorlte Keyboard Glassbridge"
+          ],
+          "nested": false
+        },
+        "perFrameActualFrameTimesMs": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              49.97,
+              16.72,
+              16.64,
+              33.34,
+              49.98,
+              "... 1521 more items"
+            ],
+            [
+              33.68,
+              49.76,
+              50.8,
+              32.51,
+              33.18,
+              "... 1156 more items"
+            ],
+            [
+              50.08,
+              33.22,
+              50.08,
+              33.36,
+              49.89,
+              "... 1409 more items"
+            ]
+          ],
+          "nested": false
+        },
+        "vsync_avgFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            39.35,
+            51.86,
+            42.6
+          ],
+          "nested": false
+        },
+        "maxSlowFrameExcess": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            183.84,
+            116.66,
+            250.37
+          ],
+          "nested": false
+        },
+        "elapsedTimeSeconds": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            60.0481,
+            60.22107,
+            60.22226
+          ],
+          "nested": false
+        },
+        "performanceRating": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "Excellent",
+            "Good",
+            "Good"
+          ],
+          "nested": false
+        },
+        "packageName": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "com.netflix.NGP.ProjectKraken",
+            "com.netflix.NGP.ProjectKraken",
+            "com.netflix.NGP.ProjectKraken"
+          ],
+          "nested": false
+        },
+        "targetFpsConfidence": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "MEDIUM",
+            "HIGH",
+            "MEDIUM"
+          ],
+          "nested": false
+        },
+        "maxFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            233.84,
+            166.66,
+            300.37
+          ],
+          "nested": false
+        },
+        "totalFrames": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            1526,
+            1161,
+            1414
+          ],
+          "nested": false
+        },
+        "hasRawData": {
+          "type": "boolean",
+          "occurrences": 10,
+          "examples": [
+            true,
+            true,
+            true
+          ],
+          "nested": false
+        },
+        "avgFps": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            28.96,
+            21.01,
+            25.91
+          ],
+          "nested": false
+        },
+        "vsync_maxFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            223.9,
+            148.79,
+            305.36
+          ],
+          "nested": false
+        },
+        "rawDataSize": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            1527,
+            1162,
+            1415
+          ],
+          "nested": false
+        },
+        "vsync_minFrameTime": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            13.77,
+            15.07,
+            6.23
+          ],
+          "nested": false
+        }
+      },
+      "fieldTypes": {
+        "avgFrameTime": "number",
+        "jankInstabilityPercentage": "number",
+        "perFrameSlowFrameExcess": "array",
+        "timestamp": "string",
+        "targetFPS": "number",
+        "deviceInfo": "object",
+        "deviceInfo.ro.product.cpu.abilist64": "string",
+        "deviceInfo.ro.oem.brand": "string",
+        "deviceInfo.ro.build.fingerprint": "string",
+        "deviceInfo.ro.kernel.version": "string",
+        "deviceInfo.ro.build.version.release_or_codename": "string",
+        "deviceInfo.appName": "string",
+        "deviceInfo.ro.product.cpu.abi": "string",
+        "deviceInfo.ro.product.manufacturer": "string",
+        "deviceInfo.ro.soc.model": "string",
+        "deviceInfo.ro.product.cpu.abilist32": "string",
+        "deviceInfo.ro.hardware.egl": "string",
+        "deviceInfo.ro.build.version.release": "string",
+        "deviceInfo.ro.serialno": "string",
+        "deviceInfo.ro.opengles.version": "string",
+        "deviceInfo.ro.product.model": "string",
+        "deviceInfo.ro.soc.manufacturer": "string",
+        "deviceInfo.MemTotal": "string",
+        "deviceInfo.appVersion": "string",
+        "deviceInfo.dalvik.vm.heapgrowthlimit": "string",
+        "deviceInfo.ro.hwui.use_vulkan": "string",
+        "deviceInfo.dalvik.vm.heapsize": "string",
+        "deviceInfo.ro.lmk.use_psi": "string",
+        "deviceInfo.ro.build.version.sdk": "string",
+        "deviceInfo.ro.build.version.release_or_preview_display": "string",
+        "deviceInfo.ro.product.cpu.abilist": "string",
+        "deviceInfo.ro.hardware.gralloc": "string",
+        "deviceInfo.ro.product.board": "string",
+        "deviceInfo.ro.hardware.vulkan": "string",
+        "createdAt": "timestamp",
+        "avgJankInstability": "number",
+        "rawFpsData": "array",
+        "vsync_avgFps": "number",
+        "perFrameInstantaneousFps": "array",
+        "vsync_maxFps": "number",
+        "slowFramePercentage": "number",
+        "maxJankInstability": "number",
+        "perFrameInstability": "array",
+        "targetFpsScore": "number",
+        "maxFps": "number",
+        "minFps": "number",
+        "slowFramesCount": "number",
+        "updatedAt": "timestamp",
+        "minFrameTime": "number",
+        "refreshRate": "number",
+        "vsync_minFps": "number",
+        "choppinessRating": "string",
+        "jankInstabilityCount": "number",
+        "fileName": "string",
+        "avgSlowFrameExcess": "number",
+        "fpsBuckets": "object",
+        "fpsBuckets.bucket_70_plus": "number",
+        "fpsBuckets.bucket_0_3": "number",
+        "fpsBuckets.bucket_50_70": "number",
+        "fpsBuckets.bucket_5_7": "number",
+        "fpsBuckets.endBattery": "number",
+        "fpsBuckets.bucket_19_22": "number",
+        "fpsBuckets.refreshRate": "number",
+        "fpsBuckets.bucket_9_11": "number",
+        "fpsBuckets.bucket_11_13": "number",
+        "fpsBuckets.bucket_26_35": "number",
+        "fpsBuckets.bucket_13_16": "number",
+        "fpsBuckets.elapsedTime": "number",
+        "fpsBuckets.bucket_3_5": "number",
+        "fpsBuckets.bucket_22_26": "number",
+        "fpsBuckets.bucket_7_9": "number",
+        "fpsBuckets.batteryDrain": "number",
+        "fpsBuckets.bucket_35_50": "number",
+        "fpsBuckets.bucket_16_19": "number",
+        "fpsBuckets.totalFrames": "number",
+        "fpsBuckets.startBattery": "number",
+        "fpsBuckets.avgFps": "number",
+        "appName": "string",
+        "perFrameActualFrameTimesMs": "array",
+        "vsync_avgFrameTime": "number",
+        "maxSlowFrameExcess": "number",
+        "elapsedTimeSeconds": "number",
+        "performanceRating": "string",
+        "packageName": "string",
+        "targetFpsConfidence": "string",
+        "maxFrameTime": "number",
+        "totalFrames": "number",
+        "hasRawData": "boolean",
+        "avgFps": "number",
+        "vsync_maxFrameTime": "number",
+        "rawDataSize": "number",
+        "vsync_minFrameTime": "number"
+      },
+      "requiredFields": [
+        "avgFrameTime",
+        "jankInstabilityPercentage",
+        "perFrameSlowFrameExcess",
+        "timestamp",
+        "targetFPS",
+        "deviceInfo",
+        "deviceInfo.ro.product.cpu.abilist64",
+        "deviceInfo.ro.oem.brand",
+        "deviceInfo.ro.build.fingerprint",
+        "deviceInfo.ro.kernel.version",
+        "deviceInfo.ro.build.version.release_or_codename",
+        "deviceInfo.appName",
+        "deviceInfo.ro.product.cpu.abi",
+        "deviceInfo.ro.product.manufacturer",
+        "deviceInfo.ro.soc.model",
+        "deviceInfo.ro.product.cpu.abilist32",
+        "deviceInfo.ro.hardware.egl",
+        "deviceInfo.ro.build.version.release",
+        "deviceInfo.ro.serialno",
+        "deviceInfo.ro.opengles.version",
+        "deviceInfo.ro.product.model",
+        "deviceInfo.ro.soc.manufacturer",
+        "deviceInfo.MemTotal",
+        "deviceInfo.appVersion",
+        "deviceInfo.dalvik.vm.heapgrowthlimit",
+        "deviceInfo.ro.hwui.use_vulkan",
+        "deviceInfo.dalvik.vm.heapsize",
+        "deviceInfo.ro.lmk.use_psi",
+        "deviceInfo.ro.build.version.sdk",
+        "deviceInfo.ro.build.version.release_or_preview_display",
+        "deviceInfo.ro.product.cpu.abilist",
+        "deviceInfo.ro.hardware.gralloc",
+        "deviceInfo.ro.product.board",
+        "deviceInfo.ro.hardware.vulkan",
+        "createdAt",
+        "avgJankInstability",
+        "rawFpsData",
+        "vsync_avgFps",
+        "perFrameInstantaneousFps",
+        "vsync_maxFps",
+        "slowFramePercentage",
+        "maxJankInstability",
+        "perFrameInstability",
+        "targetFpsScore",
+        "maxFps",
+        "minFps",
+        "slowFramesCount",
+        "updatedAt",
+        "minFrameTime",
+        "refreshRate",
+        "vsync_minFps",
+        "choppinessRating",
+        "jankInstabilityCount",
+        "fileName",
+        "avgSlowFrameExcess",
+        "fpsBuckets",
+        "fpsBuckets.bucket_70_plus",
+        "fpsBuckets.bucket_0_3",
+        "fpsBuckets.bucket_50_70",
+        "fpsBuckets.bucket_5_7",
+        "fpsBuckets.endBattery",
+        "fpsBuckets.bucket_19_22",
+        "fpsBuckets.refreshRate",
+        "fpsBuckets.bucket_9_11",
+        "fpsBuckets.bucket_11_13",
+        "fpsBuckets.bucket_26_35",
+        "fpsBuckets.bucket_13_16",
+        "fpsBuckets.elapsedTime",
+        "fpsBuckets.bucket_3_5",
+        "fpsBuckets.bucket_22_26",
+        "fpsBuckets.bucket_7_9",
+        "fpsBuckets.batteryDrain",
+        "fpsBuckets.bucket_35_50",
+        "fpsBuckets.bucket_16_19",
+        "fpsBuckets.totalFrames",
+        "fpsBuckets.startBattery",
+        "fpsBuckets.avgFps",
+        "appName",
+        "perFrameActualFrameTimesMs",
+        "vsync_avgFrameTime",
+        "maxSlowFrameExcess",
+        "elapsedTimeSeconds",
+        "performanceRating",
+        "packageName",
+        "targetFpsConfidence",
+        "maxFrameTime",
+        "totalFrames",
+        "hasRawData",
+        "avgFps",
+        "vsync_maxFrameTime",
+        "rawDataSize",
+        "vsync_minFrameTime"
+      ],
+      "optionalFields": [],
+      "sampleDocuments": [
+        {
+          "id": "7cmkWkkKUO5GsqC0B8W1",
+          "data": {
+            "avgFrameTime": 39.35,
+            "jankInstabilityPercentage": 24.6,
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              "... 1521 more items"
+            ],
+            "timestamp": "10/08/2025, 01:26:58",
+            "targetFPS": 30,
+            "deviceInfo": {
+              "ro.product.cpu.abilist64": "x86_64,arm64-v8a",
+              "ro.oem.brand": "omnigul",
+              "ro.build.fingerprint": "google/brya/brya_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.kernel.version": "5.10",
+              "ro.build.version.release_or_codename": "13",
+              "appName": "Unknown App",
+              "ro.product.cpu.abi": "x86_64",
+              "ro.product.manufacturer": "Google",
+              "ro.soc.model": "i3-1315U",
+              "ro.product.cpu.abilist32": "",
+              "ro.hardware.egl": "angle",
+              "ro.build.version.release": "13",
+              "ro.serialno": "450C1D3FE3F3477DAE7A",
+              "ro.opengles.version": "196609",
+              "ro.product.model": "brya",
+              "ro.soc.manufacturer": "Intel",
+              "MemTotal": "7158436 kB",
+              "appVersion": "0.0.14742",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.hwui.use_vulkan": "true",
+              "dalvik.vm.heapsize": "512m",
+              "ro.lmk.use_psi": "true",
+              "ro.build.version.sdk": "33",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.product.board": "omnigul",
+              "ro.hardware.vulkan": "cheets"
+            },
+            "createdAt": "[Timestamp: 2025-08-10T08:26:58.894Z]",
+            "avgJankInstability": 22.03,
+            "rawFpsData": [
+              {
+                "fenceTime": 19470741388058,
+                "instantFps": 30.03,
+                "latency": 14.04,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "vsyncTime": 19470727352283,
+                "presentationTime": 19470767515484,
+                "deltaTime": 33.3
+              },
+              {
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "fenceTime": 19470788319810,
+                "vsyncTime": 19470775054895,
+                "latency": 13.26,
+                "presentationTime": 19470817487486,
+                "instantFps": 20.01,
+                "deltaTime": 49.97
+              },
+              {
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "latency": 13.08,
+                "deltaTime": 16.72,
+                "presentationTime": 19470834205383,
+                "fenceTime": 19470807213106,
+                "vsyncTime": 19470794136700,
+                "instantFps": 59.82
+              },
+              {
+                "vsyncTime": 19470819737626,
+                "presentationTime": 19470850844906,
+                "latency": 13.64,
+                "deltaTime": 16.64,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "instantFps": 60.1,
+                "fenceTime": 19470833379160
+              },
+              {
+                "fenceTime": 19470867625558,
+                "vsyncTime": 19470854487626,
+                "presentationTime": 19470884184531,
+                "testId": "9680dfa4-47cf-4ca6-80b9-735af9188ab8",
+                "instantFps": 29.99,
+                "deltaTime": 33.34,
+                "latency": 13.14
+              },
+              "... 1522 more items"
+            ],
+            "vsync_avgFps": 27.61,
+            "perFrameInstantaneousFps": [
+              20.01,
+              59.82,
+              60.1,
+              29.99,
+              20.01,
+              "... 1521 more items"
+            ],
+            "vsync_maxFps": 72.62,
+            "slowFramePercentage": 9.7,
+            "maxJankInstability": 133.85,
+            "perFrameInstability": [
+              0,
+              0,
+              0,
+              16.7,
+              16.64,
+              "... 1521 more items"
+            ],
+            "targetFpsScore": 51.8565815324165,
+            "maxFps": 61.12,
+            "minFps": 4.28,
+            "slowFramesCount": 148,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:58.894Z]",
+            "minFrameTime": 16.36,
+            "refreshRate": 60,
+            "vsync_minFps": 4.47,
+            "choppinessRating": "Choppy",
+            "jankInstabilityCount": 376,
+            "fileName": "Upload 12",
+            "avgSlowFrameExcess": 23.44,
+            "fpsBuckets": {
+              "bucket_70_plus": 127,
+              "bucket_0_3": 0,
+              "bucket_50_70": 0,
+              "bucket_5_7": 1,
+              "endBattery": 1438,
+              "bucket_19_22": 0,
+              "refreshRate": 99,
+              "bucket_9_11": 11,
+              "bucket_11_13": 14,
+              "bucket_26_35": 0,
+              "bucket_13_16": 20,
+              "elapsedTime": 1528,
+              "bucket_3_5": 0,
+              "bucket_22_26": 381,
+              "bucket_7_9": 4,
+              "batteryDrain": 98,
+              "bucket_35_50": 929,
+              "bucket_16_19": 40,
+              "totalFrames": 28,
+              "startBattery": 60,
+              "avgFps": 0
+            },
+            "appName": "Omnigul Keyboard Steppingstone",
+            "perFrameActualFrameTimesMs": [
+              49.97,
+              16.72,
+              16.64,
+              33.34,
+              49.98,
+              "... 1521 more items"
+            ],
+            "vsync_avgFrameTime": 39.35,
+            "maxSlowFrameExcess": 183.84,
+            "elapsedTimeSeconds": 60.0481,
+            "performanceRating": "Excellent",
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "targetFpsConfidence": "MEDIUM",
+            "maxFrameTime": 233.84,
+            "totalFrames": 1526,
+            "hasRawData": true,
+            "avgFps": 28.96,
+            "vsync_maxFrameTime": 223.9,
+            "rawDataSize": 1527,
+            "vsync_minFrameTime": 13.77
+          }
+        },
+        {
+          "id": "7rEL4hQDtTgqTVdHFbpT",
+          "data": {
+            "vsync_maxFrameTime": 148.79,
+            "jankInstabilityPercentage": 30,
+            "slowFramesCount": 562,
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0.8,
+              0,
+              0,
+              "... 1156 more items"
+            ],
+            "rawFpsData": [
+              {
+                "vsyncTime": 1701089942253,
+                "deltaTime": 33.32,
+                "presentationTime": 1701132491484,
+                "instantFps": 30.01,
+                "latency": 15.29,
+                "fenceTime": 1701105231869,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "vsyncTime": 1701125025945,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327",
+                "fenceTime": 1701142169407,
+                "deltaTime": 33.68,
+                "instantFps": 29.69,
+                "presentationTime": 1701166168945,
+                "latency": 17.14
+              },
+              {
+                "latency": 16.85,
+                "vsyncTime": 1701169852022,
+                "presentationTime": 1701215926407,
+                "instantFps": 20.1,
+                "deltaTime": 49.76,
+                "fenceTime": 1701186705561,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "instantFps": 19.69,
+                "vsyncTime": 1701228274022,
+                "presentationTime": 1701266721407,
+                "fenceTime": 1701244611099,
+                "latency": 16.34,
+                "deltaTime": 50.8,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327"
+              },
+              {
+                "presentationTime": 1701299232407,
+                "deltaTime": 32.51,
+                "vsyncTime": 1701258793869,
+                "testId": "abef5d99-c454-41cf-b1b6-42ed87446327",
+                "fenceTime": 1701275205330,
+                "latency": 16.41,
+                "instantFps": 30.76
+              },
+              "... 1157 more items"
+            ],
+            "perFrameInstantaneousFps": [
+              29.69,
+              20.1,
+              19.69,
+              30.76,
+              30.14,
+              "... 1156 more items"
+            ],
+            "timestamp": "10/08/2025, 01:27:03",
+            "fpsBuckets": {
+              "bucket_22_26": 597,
+              "bucket_35_50": 246,
+              "bucket_0_3": 0,
+              "avgFps": 0,
+              "totalFrames": 21,
+              "bucket_11_13": 9,
+              "startBattery": 60,
+              "bucket_70_plus": 11,
+              "bucket_7_9": 4,
+              "bucket_3_5": 0,
+              "bucket_5_7": 0,
+              "bucket_50_70": 0,
+              "bucket_16_19": 260,
+              "elapsedTime": 1163,
+              "bucket_26_35": 0,
+              "batteryDrain": 100,
+              "refreshRate": 100,
+              "bucket_19_22": 2,
+              "bucket_13_16": 25,
+              "bucket_9_11": 8,
+              "endBattery": 1157
+            },
+            "perFrameInstability": [
+              0,
+              16.08,
+              0,
+              0,
+              0,
+              "... 1156 more items"
+            ],
+            "hasRawData": true,
+            "elapsedTimeSeconds": 60.22107,
+            "minFps": 6,
+            "refreshRate": 60,
+            "targetFPS": 30,
+            "avgSlowFrameExcess": 11.94,
+            "performanceRating": "Good",
+            "createdAt": "[Timestamp: 2025-08-10T08:27:03.984Z]",
+            "vsync_minFps": 6.72,
+            "vsync_avgFps": 20.36,
+            "avgFps": 21.01,
+            "deviceInfo": {
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.product.manufacturer": "Google",
+              "ro.build.version.release": "13",
+              "ro.product.model": "corsola",
+              "ro.hwui.use_vulkan": "true",
+              "ro.serialno": "54B9ADFED6ADD0B686FB",
+              "ro.hardware.egl": "angle",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.opengles.version": "196609",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.build.version.sdk": "33",
+              "ro.soc.model": "Kompanio 520 MT8186",
+              "ro.product.board": "veluza",
+              "ro.build.fingerprint": "google/corsola/corsola_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.product.cpu.abilist32": "",
+              "ro.build.version.release_or_codename": "13",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.soc.manufacturer": "Mediatek",
+              "appVersion": "0.0.14742",
+              "appName": "Unknown App",
+              "dalvik.vm.heapsize": "512m",
+              "MemTotal": "7324964 kB",
+              "ro.hardware.vulkan": "cheets",
+              "ro.lmk.use_psi": "true",
+              "ro.oem.brand": "veluza",
+              "ro.kernel.version": "5.10",
+              "dalvik.vm.heapgrowthlimit": "192m"
+            },
+            "maxFrameTime": 166.66,
+            "slowFramePercentage": 48.4,
+            "avgFrameTime": 51.87,
+            "vsync_maxFps": 66.36,
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "fileName": "Upload 15",
+            "vsync_avgFrameTime": 51.86,
+            "maxJankInstability": 100.45,
+            "targetFpsScore": 98.81239242685027,
+            "vsync_minFrameTime": 15.07,
+            "targetFpsConfidence": "HIGH",
+            "avgJankInstability": 21.4,
+            "jankInstabilityCount": 348,
+            "rawDataSize": 1162,
+            "maxSlowFrameExcess": 116.66,
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:03.984Z]",
+            "appName": "Veluza Keyboard Redlightgreenlight",
+            "perFrameActualFrameTimesMs": [
+              33.68,
+              49.76,
+              50.8,
+              32.51,
+              33.18,
+              "... 1156 more items"
+            ],
+            "choppinessRating": "Choppy",
+            "totalFrames": 1161,
+            "maxFps": 63.94,
+            "minFrameTime": 15.64
+          }
+        },
+        {
+          "id": "CEOz5GIoD7u7Dc4tQfcu",
+          "data": {
+            "vsync_maxFrameTime": 305.36,
+            "jankInstabilityPercentage": 30.7,
+            "timestamp": "10/08/2025, 01:26:51",
+            "vsync_minFps": 3.27,
+            "targetFpsScore": 53.113074204947,
+            "targetFpsConfidence": "MEDIUM",
+            "slowFramePercentage": 23.3,
+            "deviceInfo": {
+              "ro.product.cpu.abilist32": "",
+              "appName": "Unknown App",
+              "ro.hardware.egl": "mesa",
+              "ro.oem.brand": "lazor",
+              "ro.soc.manufacturer": "Qualcomm",
+              "ro.kernel.version": "5.10",
+              "ro.hardware.vulkan": "cheets",
+              "ro.product.board": "lazor",
+              "ro.lmk.use_psi": "true",
+              "ro.product.manufacturer": "Google",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.build.version.release": "13",
+              "dalvik.vm.heapsize": "512m",
+              "ro.build.version.release_or_codename": "13",
+              "appVersion": "0.0.14742",
+              "ro.build.version.sdk": "33",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.build.fingerprint": "google/trogdor/trogdor_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.opengles.version": "196610",
+              "ro.serialno": "C158DFC5642DACFC02C9",
+              "ro.product.model": "trogdor",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.soc.model": "SC7180",
+              "MemTotal": "7199260 kB",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hwui.use_vulkan": "true"
+            },
+            "totalFrames": 1414,
+            "minFrameTime": 15.93,
+            "perFrameInstability": [
+              0,
+              0,
+              16.86,
+              0,
+              16.53,
+              "... 1409 more items"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:51.484Z]",
+            "perFrameInstantaneousFps": [
+              19.97,
+              30.1,
+              19.97,
+              29.98,
+              20.05,
+              "... 1409 more items"
+            ],
+            "vsync_maxFps": 160.45,
+            "maxJankInstability": 267.4,
+            "avgFrameTime": 42.59,
+            "maxFps": 62.79,
+            "targetFPS": 30,
+            "hasRawData": true,
+            "choppinessRating": "Choppy",
+            "maxFrameTime": 300.37,
+            "avgSlowFrameExcess": 5.1,
+            "refreshRate": 60,
+            "elapsedTimeSeconds": 60.22226,
+            "avgFps": 25.91,
+            "slowFramesCount": 330,
+            "perFrameSlowFrameExcess": [
+              0.08,
+              0,
+              0.08,
+              0,
+              0,
+              "... 1409 more items"
+            ],
+            "vsync_avgFrameTime": 42.6,
+            "appName": "Lazorlte Keyboard Glassbridge",
+            "rawFpsData": [
+              {
+                "instantFps": 20.05,
+                "vsyncTime": 81327543464132,
+                "presentationTime": 81327602047830,
+                "latency": 35.77,
+                "deltaTime": 49.87,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "fenceTime": 81327579231059
+              },
+              {
+                "deltaTime": 50.08,
+                "fenceTime": 81327621683403,
+                "latency": 35.8,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "vsyncTime": 81327585887986,
+                "instantFps": 19.97,
+                "presentationTime": 81327652130382
+              },
+              {
+                "latency": 33.31,
+                "vsyncTime": 81327632787882,
+                "presentationTime": 81327685352830,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "deltaTime": 33.22,
+                "fenceTime": 81327666096163,
+                "instantFps": 30.1
+              },
+              {
+                "vsyncTime": 81327673989340,
+                "instantFps": 19.97,
+                "presentationTime": 81327735430330,
+                "fenceTime": 81327708309496,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "latency": 34.32,
+                "deltaTime": 50.08
+              },
+              {
+                "vsyncTime": 81327714546267,
+                "testId": "36af83ab-b3fc-434b-8fda-5df47e35888f",
+                "instantFps": 29.98,
+                "fenceTime": 81327748500642,
+                "deltaTime": 33.36,
+                "presentationTime": 81327768786267,
+                "latency": 33.95
+              },
+              "... 1410 more items"
+            ],
+            "performanceRating": "Good",
+            "avgJankInstability": 20.27,
+            "rawDataSize": 1415,
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "maxSlowFrameExcess": 250.37,
+            "createdAt": "[Timestamp: 2025-08-10T08:26:51.484Z]",
+            "vsync_minFrameTime": 6.23,
+            "jankInstabilityCount": 434,
+            "fpsBuckets": {
+              "bucket_0_3": 0,
+              "bucket_19_22": 2,
+              "bucket_26_35": 1,
+              "avgFps": 0,
+              "bucket_35_50": 578,
+              "batteryDrain": 91,
+              "bucket_11_13": 3,
+              "bucket_5_7": 1,
+              "bucket_3_5": 0,
+              "refreshRate": 91,
+              "bucket_50_70": 1,
+              "bucket_16_19": 28,
+              "bucket_13_16": 10,
+              "bucket_22_26": 714,
+              "startBattery": 60,
+              "endBattery": 1387,
+              "bucket_70_plus": 73,
+              "bucket_9_11": 2,
+              "bucket_7_9": 2,
+              "totalFrames": 25,
+              "elapsedTime": 1416
+            },
+            "minFps": 3.33,
+            "fileName": "Upload 8",
+            "vsync_avgFps": 24.66,
+            "perFrameActualFrameTimesMs": [
+              50.08,
+              33.22,
+              50.08,
+              33.36,
+              49.89,
+              "... 1409 more items"
+            ]
+          }
+        },
+        {
+          "id": "Dl5drPQ9v09w1ZkTlpVH",
+          "data": {
+            "totalFrames": 1808,
+            "vsync_maxFrameTime": 56.18,
+            "rawDataSize": 1809,
+            "maxFrameTime": 66.76,
+            "targetFPS": 30,
+            "performanceRating": "Excellent",
+            "vsync_maxFps": 70.95,
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "refreshRate": 60,
+            "slowFramePercentage": 2.8,
+            "vsync_avgFrameTime": 33.33,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:49.358Z]",
+            "vsync_minFrameTime": 14.1,
+            "vsync_minFps": 17.8,
+            "timestamp": "10/08/2025, 01:26:48",
+            "jankInstabilityCount": 172,
+            "avgFps": 31.17,
+            "createdAt": "[Timestamp: 2025-08-10T08:26:49.358Z]",
+            "maxFps": 62.33,
+            "perFrameActualFrameTimesMs": [
+              33.01,
+              50.05,
+              33.33,
+              33.36,
+              16.67,
+              "... 1803 more items"
+            ],
+            "hasRawData": true,
+            "avgFrameTime": 33.33,
+            "jankInstabilityPercentage": 9.5,
+            "perFrameInstantaneousFps": [
+              30.29,
+              19.98,
+              30.01,
+              29.98,
+              60,
+              "... 1803 more items"
+            ],
+            "avgJankInstability": 20.25,
+            "appName": "Hylia Keyboard Redlightgreenlight",
+            "minFps": 14.98,
+            "targetFpsConfidence": "LOW",
+            "slowFramesCount": 50,
+            "fileName": "Upload 7",
+            "maxSlowFrameExcess": 16.76,
+            "minFrameTime": 16.04,
+            "perFrameSlowFrameExcess": [
+              0,
+              0.05,
+              0,
+              0,
+              0,
+              "... 1803 more items"
+            ],
+            "fpsBuckets": {
+              "batteryDrain": 100,
+              "avgFps": 0,
+              "totalFrames": 31,
+              "bucket_5_7": 0,
+              "bucket_9_11": 0,
+              "bucket_0_3": 0,
+              "endBattery": 1767,
+              "bucket_26_35": 0,
+              "bucket_70_plus": 105,
+              "refreshRate": 100,
+              "bucket_16_19": 2,
+              "bucket_7_9": 0,
+              "startBattery": 60,
+              "bucket_35_50": 1601,
+              "bucket_19_22": 0,
+              "elapsedTime": 1810,
+              "bucket_50_70": 0,
+              "bucket_13_16": 0,
+              "bucket_3_5": 0,
+              "bucket_22_26": 101,
+              "bucket_11_13": 0
+            },
+            "targetFpsScore": 28.258706467661693,
+            "vsync_avgFps": 30.27,
+            "rawFpsData": [
+              {
+                "instantFps": 29.76,
+                "vsyncTime": 1420476361930,
+                "presentationTime": 1420502518238,
+                "fenceTime": 1420482179469,
+                "testId": "96810a8e-c9ad-495d-93ac-959ba6cb1722",
+                "latency": 5.82,
+                "deltaTime": 33.6
+              },
+              {
+                "vsyncTime": 1420509647161,
+                "instantFps": 30.29,
+                "deltaTime": 33.01,
+                "latency": 5.77,
+                "fenceTime": 1420515413392,
+                "testId": "96810a8e-c9ad-495d-93ac-959ba6cb1722",
+                "presentationTime": 1420535527853
+              },
+              {
+                "testId": "96810a8e-c9ad-495d-93ac-959ba6cb1722",
+                "fenceTime": 1420565169930,
+                "presentationTime": 1420585577699,
+                "instantFps": 19.98,
+                "latency": 7.53,
+                "vsyncTime": 1420557639238,
+                "deltaTime": 50.05
+              },
+              {
+                "deltaTime": 33.33,
+                "instantFps": 30.01,
+                "fenceTime": 1420588394315,
+                "presentationTime": 1420618903469,
+                "latency": 7.63,
+                "vsyncTime": 1420580762623,
+                "testId": "96810a8e-c9ad-495d-93ac-959ba6cb1722"
+              },
+              {
+                "deltaTime": 33.36,
+                "presentationTime": 1420652259776,
+                "latency": 8.81,
+                "vsyncTime": 1420624133084,
+                "fenceTime": 1420632940161,
+                "testId": "96810a8e-c9ad-495d-93ac-959ba6cb1722",
+                "instantFps": 29.98
+              },
+              "... 1804 more items"
+            ],
+            "deviceInfo": {
+              "ro.build.version.release_or_codename": "13",
+              "ro.build.fingerprint": "google/rauru/rauru_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.hardware.vulkan": "cheets",
+              "ro.oem.brand": "hylia",
+              "ro.build.version.sdk": "33",
+              "ro.build.version.release": "13",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.build.version.release_or_preview_display": "13",
+              "appVersion": "0.0.14742",
+              "ro.hardware.egl": "angle",
+              "ro.opengles.version": "196609",
+              "ro.product.cpu.abilist32": "",
+              "ro.serialno": "E54E71582219799E623C",
+              "ro.soc.manufacturer": "Mediatek",
+              "MemTotal": "14827168 kB",
+              "ro.product.model": "rauru",
+              "ro.product.board": "hylia",
+              "ro.product.manufacturer": "Google",
+              "ro.soc.model": "MT8196",
+              "dalvik.vm.heapsize": "512m",
+              "ro.kernel.version": "5.10",
+              "ro.hwui.use_vulkan": "true",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "appName": "Unknown App",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.lmk.use_psi": "true",
+              "ro.hardware.gralloc": "minigbm_arcvm"
+            },
+            "maxJankInstability": 50.1,
+            "elapsedTimeSeconds": 60.26064,
+            "choppinessRating": "Moderate",
+            "perFrameInstability": [
+              0,
+              17.04,
+              0,
+              0,
+              0,
+              "... 1803 more items"
+            ],
+            "avgSlowFrameExcess": 0.81
+          }
+        },
+        {
+          "id": "DpJ2SnKEFPULraExVqlY",
+          "data": {
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "perFrameActualFrameTimesMs": [
+              50.11,
+              33.24,
+              116.44,
+              33.94,
+              49.56,
+              "... 1607 more items"
+            ],
+            "minFrameTime": 16.34,
+            "targetFPS": 30,
+            "avgSlowFrameExcess": 0.83,
+            "fileName": "Upload 16",
+            "slowFramePercentage": 10.4,
+            "fpsBuckets": {
+              "bucket_35_50": 1166,
+              "bucket_7_9": 0,
+              "bucket_9_11": 1,
+              "bucket_3_5": 0,
+              "bucket_5_7": 0,
+              "elapsedTime": 1614,
+              "avgFps": 0,
+              "batteryDrain": 100,
+              "bucket_0_3": 0,
+              "endBattery": 1600,
+              "bucket_13_16": 0,
+              "bucket_26_35": 0,
+              "bucket_70_plus": 40,
+              "bucket_19_22": 0,
+              "startBattery": 60,
+              "bucket_22_26": 403,
+              "bucket_50_70": 0,
+              "totalFrames": 28,
+              "bucket_11_13": 0,
+              "bucket_16_19": 3,
+              "refreshRate": 100
+            },
+            "avgJankInstability": 17.82,
+            "vsync_avgFps": 27.31,
+            "deviceInfo": {
+              "dalvik.vm.heapsize": "512m",
+              "ro.soc.manufacturer": "Mediatek",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "MemTotal": "7324964 kB",
+              "ro.hardware.vulkan": "cheets",
+              "ro.build.fingerprint": "google/corsola/corsola_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.product.board": "veluza",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.lmk.use_psi": "true",
+              "ro.soc.model": "Kompanio 520 MT8186",
+              "ro.opengles.version": "196609",
+              "appVersion": "0.0.14742",
+              "ro.hwui.use_vulkan": "true",
+              "ro.build.version.release": "13",
+              "ro.kernel.version": "5.10",
+              "ro.hardware.egl": "angle",
+              "ro.build.version.sdk": "33",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.oem.brand": "veluza",
+              "ro.build.version.release_or_codename": "13",
+              "ro.serialno": "54B9ADFED6ADD0B686FB",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.product.model": "corsola",
+              "ro.product.cpu.abilist32": "",
+              "ro.product.manufacturer": "Google",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "appName": "Unknown App"
+            },
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:05.594Z]",
+            "targetFpsConfidence": "MEDIUM",
+            "slowFramesCount": 167,
+            "perFrameInstability": [
+              0,
+              0,
+              83.2,
+              0,
+              15.62,
+              "... 1607 more items"
+            ],
+            "vsync_maxFrameTime": 99.42,
+            "vsync_minFps": 10.06,
+            "perFrameSlowFrameExcess": [
+              0.11,
+              0,
+              66.44,
+              0,
+              0,
+              "... 1607 more items"
+            ],
+            "targetFpsScore": 54.2374457532548,
+            "vsync_minFrameTime": 17.84,
+            "vsync_maxFps": 56.07,
+            "appName": "Veluza Keyboard Stairrace",
+            "timestamp": "10/08/2025, 01:27:05",
+            "maxFps": 61.19,
+            "minFps": 8.59,
+            "vsync_avgFrameTime": 37.17,
+            "maxSlowFrameExcess": 66.44,
+            "jankInstabilityCount": 391,
+            "createdAt": "[Timestamp: 2025-08-10T08:27:05.594Z]",
+            "rawFpsData": [
+              {
+                "presentationTime": 1883668584110,
+                "deltaTime": 50.01,
+                "latency": 18.61,
+                "testId": "6583d53a-b85e-4b6f-adf0-21f65b9ba06f",
+                "fenceTime": 1883637707264,
+                "instantFps": 20,
+                "vsyncTime": 1883619092264
+              },
+              {
+                "vsyncTime": 1883671930649,
+                "latency": 19.76,
+                "fenceTime": 1883691688879,
+                "instantFps": 19.95,
+                "deltaTime": 50.11,
+                "testId": "6583d53a-b85e-4b6f-adf0-21f65b9ba06f",
+                "presentationTime": 1883718698956
+              },
+              {
+                "testId": "6583d53a-b85e-4b6f-adf0-21f65b9ba06f",
+                "deltaTime": 33.24,
+                "fenceTime": 1883728137649,
+                "vsyncTime": 1883709795572,
+                "latency": 18.34,
+                "presentationTime": 1883751937649,
+                "instantFps": 30.09
+              },
+              {
+                "deltaTime": 116.44,
+                "latency": 42.48,
+                "testId": "6583d53a-b85e-4b6f-adf0-21f65b9ba06f",
+                "instantFps": 8.59,
+                "vsyncTime": 1883809217264,
+                "presentationTime": 1883868372649,
+                "fenceTime": 1883851696649
+              },
+              {
+                "deltaTime": 33.94,
+                "presentationTime": 1883902315033,
+                "vsyncTime": 1883845075572,
+                "fenceTime": 1883880920726,
+                "instantFps": 29.46,
+                "latency": 35.85,
+                "testId": "6583d53a-b85e-4b6f-adf0-21f65b9ba06f"
+              },
+              "... 1608 more items"
+            ],
+            "maxJankInstability": 83.2,
+            "totalFrames": 1612,
+            "choppinessRating": "Choppy",
+            "elapsedTimeSeconds": 59.91804,
+            "maxFrameTime": 116.44,
+            "avgFps": 28.21,
+            "hasRawData": true,
+            "rawDataSize": 1613,
+            "refreshRate": 60,
+            "jankInstabilityPercentage": 24.3,
+            "avgFrameTime": 37.17,
+            "performanceRating": "Excellent",
+            "perFrameInstantaneousFps": [
+              19.95,
+              30.09,
+              8.59,
+              29.46,
+              20.18,
+              "... 1607 more items"
+            ]
+          }
+        },
+        {
+          "id": "NeFbl8rN1fmG0jm1fKTW",
+          "data": {
+            "minFrameTime": 16.03,
+            "performanceRating": "Good",
+            "avgFps": 23.19,
+            "deviceInfo": {
+              "ro.oem.brand": "lazor",
+              "ro.product.cpu.abilist32": "",
+              "ro.build.version.release": "13",
+              "ro.opengles.version": "196610",
+              "MemTotal": "7199260 kB",
+              "ro.lmk.use_psi": "true",
+              "ro.serialno": "C158DFC5642DACFC02C9",
+              "appVersion": "0.0.14742",
+              "dalvik.vm.heapsize": "512m",
+              "ro.build.version.release_or_codename": "13",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hardware.vulkan": "cheets",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.product.board": "lazor",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.soc.model": "SC7180",
+              "ro.product.model": "trogdor",
+              "ro.build.fingerprint": "google/trogdor/trogdor_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "appName": "Unknown App",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.hardware.egl": "mesa",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.build.version.sdk": "33",
+              "ro.hwui.use_vulkan": "true",
+              "ro.kernel.version": "5.10",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.soc.manufacturer": "Qualcomm",
+              "ro.product.manufacturer": "Google"
+            },
+            "vsync_avgFrameTime": 46.29,
+            "rawFpsData": [
+              {
+                "testId": "a4611ea5-673f-421a-a491-146d5d1e63a7",
+                "vsyncTime": 81221848247818,
+                "deltaTime": 16.47,
+                "latency": 21.68,
+                "fenceTime": 81221869927922,
+                "instantFps": 60.71,
+                "presentationTime": 81221885376464
+              },
+              {
+                "testId": "a4611ea5-673f-421a-a491-146d5d1e63a7",
+                "instantFps": 30.01,
+                "presentationTime": 81221918698130,
+                "vsyncTime": 81221869910005,
+                "latency": 21.35,
+                "fenceTime": 81221891262349,
+                "deltaTime": 33.32
+              },
+              {
+                "instantFps": 60,
+                "latency": 16.39,
+                "fenceTime": 81221918141985,
+                "deltaTime": 16.67,
+                "presentationTime": 81221935364537,
+                "vsyncTime": 81221901750266,
+                "testId": "a4611ea5-673f-421a-a491-146d5d1e63a7"
+              },
+              {
+                "instantFps": 29.95,
+                "deltaTime": 33.39,
+                "latency": 17.62,
+                "presentationTime": 81221968757453,
+                "vsyncTime": 81221934671880,
+                "testId": "a4611ea5-673f-421a-a491-146d5d1e63a7",
+                "fenceTime": 81221952289693
+              },
+              {
+                "deltaTime": 33.31,
+                "testId": "a4611ea5-673f-421a-a491-146d5d1e63a7",
+                "fenceTime": 81221986666672,
+                "instantFps": 30.02,
+                "presentationTime": 81222002067037,
+                "latency": 17.07,
+                "vsyncTime": 81221969594068
+              },
+              "... 1321 more items"
+            ],
+            "perFrameInstability": [
+              0,
+              0,
+              16.72,
+              0,
+              50.27,
+              "... 1320 more items"
+            ],
+            "maxJankInstability": 86.8,
+            "jankInstabilityCount": 358,
+            "vsync_maxFrameTime": 119.22,
+            "hasRawData": true,
+            "jankInstabilityPercentage": 27,
+            "avgSlowFrameExcess": 5.14,
+            "perFrameInstantaneousFps": [
+              30.01,
+              60,
+              29.95,
+              30.02,
+              11.96,
+              "... 1320 more items"
+            ],
+            "slowFramePercentage": 35.5,
+            "maxFps": 62.39,
+            "vsync_minFrameTime": 13.37,
+            "avgFrameTime": 46.3,
+            "fpsBuckets": {
+              "bucket_3_5": 0,
+              "bucket_11_13": 6,
+              "endBattery": 1311,
+              "bucket_13_16": 23,
+              "avgFps": 0,
+              "bucket_9_11": 3,
+              "bucket_0_3": 0,
+              "bucket_16_19": 63,
+              "bucket_7_9": 0,
+              "bucket_22_26": 819,
+              "bucket_26_35": 0,
+              "startBattery": 60,
+              "bucket_35_50": 386,
+              "refreshRate": 91,
+              "totalFrames": 23,
+              "elapsedTime": 1327,
+              "bucket_5_7": 0,
+              "bucket_19_22": 1,
+              "batteryDrain": 91,
+              "bucket_70_plus": 25,
+              "bucket_50_70": 0
+            },
+            "targetFpsConfidence": "HIGH",
+            "elapsedTimeSeconds": 61.34749999999999,
+            "fileName": "Upload 9",
+            "perFrameActualFrameTimesMs": [
+              33.32,
+              16.67,
+              33.39,
+              33.31,
+              83.58,
+              "... 1320 more items"
+            ],
+            "targetFpsScore": 98.89140271493213,
+            "vsync_maxFps": 74.79,
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0,
+              0,
+              33.58,
+              "... 1320 more items"
+            ],
+            "totalFrames": 1325,
+            "createdAt": "[Timestamp: 2025-08-10T08:26:53.235Z]",
+            "timestamp": "10/08/2025, 01:26:52",
+            "maxSlowFrameExcess": 83.46,
+            "vsync_minFps": 8.39,
+            "vsync_avgFps": 22.3,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:53.235Z]",
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "appName": "Lazorlte Keyboard Redlightgreenlight",
+            "choppinessRating": "Choppy",
+            "minFps": 7.49,
+            "refreshRate": 60,
+            "rawDataSize": 1326,
+            "slowFramesCount": 471,
+            "maxFrameTime": 133.46,
+            "avgJankInstability": 20.13,
+            "targetFPS": 30
+          }
+        },
+        {
+          "id": "QZ5hhTwtgmiFISoMBoqx",
+          "data": {
+            "targetFPS": 30,
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              "... 1556 more items"
+            ],
+            "slowFramesCount": 101,
+            "totalFrames": 1561,
+            "appName": "Helios Keyboard Glassbridge",
+            "jankInstabilityCount": 497,
+            "fpsBuckets": {
+              "bucket_16_19": 28,
+              "bucket_7_9": 2,
+              "elapsedTime": 1563,
+              "bucket_13_16": 6,
+              "bucket_11_13": 3,
+              "avgFps": 0,
+              "bucket_3_5": 0,
+              "batteryDrain": 100,
+              "bucket_22_26": 507,
+              "totalFrames": 29,
+              "endBattery": 1455,
+              "bucket_70_plus": 151,
+              "refreshRate": 100,
+              "bucket_19_22": 1,
+              "bucket_0_3": 0,
+              "bucket_35_50": 862,
+              "bucket_5_7": 2,
+              "startBattery": 60,
+              "bucket_26_35": 0,
+              "bucket_50_70": 0,
+              "bucket_9_11": 0
+            },
+            "targetFpsConfidence": "MEDIUM",
+            "maxFrameTime": 266.28,
+            "createdAt": "[Timestamp: 2025-08-10T08:26:44.138Z]",
+            "rawDataSize": 1562,
+            "avgJankInstability": 21.75,
+            "minFrameTime": 16.33,
+            "timestamp": "10/08/2025, 01:26:43",
+            "refreshRate": 60,
+            "minFps": 3.76,
+            "vsync_minFps": 3.79,
+            "perFrameInstantaneousFps": [
+              30.02,
+              20.02,
+              30.02,
+              20.01,
+              30.03,
+              "... 1556 more items"
+            ],
+            "avgSlowFrameExcess": 14.29,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:44.138Z]",
+            "avgFrameTime": 38.49,
+            "avgFps": 29.21,
+            "hasRawData": true,
+            "fileName": "Upload 4",
+            "perFrameInstability": [
+              0,
+              16.64,
+              0,
+              16.65,
+              0,
+              "... 1556 more items"
+            ],
+            "maxJankInstability": 232.81,
+            "choppinessRating": "Choppy",
+            "rawFpsData": [
+              {
+                "deltaTime": 16.65,
+                "presentationTime": 1426237860028,
+                "vsyncTime": 1426208542420,
+                "fenceTime": 1426221821185,
+                "latency": 13.28,
+                "instantFps": 60.08,
+                "testId": "534d91c5-aa21-4ec9-a262-0d920654ba49"
+              },
+              {
+                "fenceTime": 1426254877211,
+                "instantFps": 30.02,
+                "testId": "534d91c5-aa21-4ec9-a262-0d920654ba49",
+                "latency": 12.27,
+                "deltaTime": 33.31,
+                "presentationTime": 1426271168900,
+                "vsyncTime": 1426242609690
+              },
+              {
+                "vsyncTime": 1426279963264,
+                "instantFps": 20.02,
+                "latency": 12.1,
+                "deltaTime": 49.95,
+                "fenceTime": 1426292064316,
+                "testId": "534d91c5-aa21-4ec9-a262-0d920654ba49",
+                "presentationTime": 1426321119265
+              },
+              {
+                "fenceTime": 1426335954879,
+                "latency": 19.51,
+                "instantFps": 30.02,
+                "vsyncTime": 1426316442504,
+                "presentationTime": 1426354427382,
+                "deltaTime": 33.31,
+                "testId": "534d91c5-aa21-4ec9-a262-0d920654ba49"
+              },
+              {
+                "latency": 19.29,
+                "vsyncTime": 1426355387360,
+                "testId": "534d91c5-aa21-4ec9-a262-0d920654ba49",
+                "presentationTime": 1426404390761,
+                "instantFps": 20.01,
+                "deltaTime": 49.96,
+                "fenceTime": 1426374674834
+              },
+              "... 1557 more items"
+            ],
+            "vsync_maxFrameTime": 264.15,
+            "vsync_avgFrameTime": 38.48,
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "deviceInfo": {
+              "ro.product.board": "helios",
+              "appVersion": "0.0.14742",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hwui.use_vulkan": "true",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.soc.manufacturer": "Intel",
+              "ro.product.cpu.abilist64": "x86_64,arm64-v8a",
+              "appName": "Unknown App",
+              "ro.lmk.use_psi": "true",
+              "ro.product.model": "hatch",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.product.cpu.abi": "x86_64",
+              "ro.kernel.version": "5.10",
+              "ro.build.version.release": "13",
+              "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+              "ro.build.version.sdk": "33",
+              "ro.product.manufacturer": "Google",
+              "ro.build.fingerprint": "google/hatch/hatch_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "MemTotal": "15370896 kB",
+              "ro.hardware.egl": "mesa",
+              "ro.product.cpu.abilist32": "",
+              "dalvik.vm.heapsize": "512m",
+              "ro.oem.brand": "helios",
+              "ro.build.version.release_or_codename": "13",
+              "ro.soc.model": "i5-10210U",
+              "ro.hardware.vulkan": "cheets",
+              "ro.serialno": "91EA9A8A292BEEC8C64E",
+              "ro.opengles.version": "196609"
+            },
+            "elapsedTimeSeconds": 60.082890000000006,
+            "jankInstabilityPercentage": 31.8,
+            "vsync_avgFps": 27.51,
+            "vsync_minFrameTime": 12.46,
+            "targetFpsScore": 51.96542893725992,
+            "perFrameActualFrameTimesMs": [
+              33.31,
+              49.95,
+              33.31,
+              49.96,
+              33.3,
+              "... 1556 more items"
+            ],
+            "slowFramePercentage": 6.5,
+            "vsync_maxFps": 80.23,
+            "maxFps": 61.23,
+            "performanceRating": "Excellent",
+            "maxSlowFrameExcess": 216.28
+          }
+        },
+        {
+          "id": "TwlPQGSSpv9Y92SpN62m",
+          "data": {
+            "rawFpsData": [
+              {
+                "fenceTime": 18017253652112,
+                "latency": 13.26,
+                "testId": "e30fb6ae-db21-45ba-bfb7-87c2ec991f55",
+                "instantFps": 29.97,
+                "deltaTime": 33.37,
+                "presentationTime": 18017283301201,
+                "vsyncTime": 18017240393532
+              },
+              {
+                "instantFps": 20.03,
+                "latency": 13.22,
+                "vsyncTime": 18017296279807,
+                "presentationTime": 18017333227720,
+                "fenceTime": 18017309497535,
+                "testId": "e30fb6ae-db21-45ba-bfb7-87c2ec991f55",
+                "deltaTime": 49.93
+              },
+              {
+                "vsyncTime": 18017320731539,
+                "testId": "e30fb6ae-db21-45ba-bfb7-87c2ec991f55",
+                "presentationTime": 18017349897833,
+                "latency": 13.15,
+                "deltaTime": 16.67,
+                "instantFps": 59.99,
+                "fenceTime": 18017333884263
+              },
+              {
+                "fenceTime": 18017353641864,
+                "instantFps": 30.02,
+                "deltaTime": 33.32,
+                "latency": 13.58,
+                "presentationTime": 18017383213811,
+                "testId": "e30fb6ae-db21-45ba-bfb7-87c2ec991f55",
+                "vsyncTime": 18017340061687
+              },
+              {
+                "deltaTime": 33.31,
+                "presentationTime": 18017416521322,
+                "latency": 13.49,
+                "fenceTime": 18017387431826,
+                "instantFps": 30.02,
+                "testId": "e30fb6ae-db21-45ba-bfb7-87c2ec991f55",
+                "vsyncTime": 18017373938212
+              },
+              "... 1789 more items"
+            ],
+            "jankInstabilityCount": 243,
+            "refreshRate": 60,
+            "timestamp": "10/08/2025, 01:26:56",
+            "minFps": 12,
+            "maxFps": 60.37,
+            "avgSlowFrameExcess": 7.47,
+            "deviceInfo": {
+              "ro.product.board": "omnigul",
+              "ro.soc.model": "i3-1315U",
+              "MemTotal": "7158436 kB",
+              "appName": "Unknown App",
+              "ro.build.version.release": "13",
+              "ro.hwui.use_vulkan": "true",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.opengles.version": "196609",
+              "ro.product.model": "brya",
+              "ro.lmk.use_psi": "true",
+              "dalvik.vm.heapsize": "512m",
+              "ro.hardware.vulkan": "cheets",
+              "ro.build.version.release_or_codename": "13",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.hardware.egl": "angle",
+              "ro.product.manufacturer": "Google",
+              "ro.kernel.version": "5.10",
+              "ro.soc.manufacturer": "Intel",
+              "ro.build.version.sdk": "33",
+              "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+              "ro.build.fingerprint": "google/brya/brya_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.serialno": "450C1D3FE3F3477DAE7A",
+              "ro.product.cpu.abilist32": "",
+              "ro.product.cpu.abilist64": "x86_64,arm64-v8a",
+              "ro.oem.brand": "omnigul",
+              "ro.product.cpu.abi": "x86_64",
+              "appVersion": "0.0.14742"
+            },
+            "perFrameActualFrameTimesMs": [
+              49.93,
+              16.67,
+              33.32,
+              33.31,
+              16.7,
+              "... 1788 more items"
+            ],
+            "avgJankInstability": 21.8,
+            "totalFrames": 1793,
+            "choppinessRating": "Moderate",
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "createdAt": "[Timestamp: 2025-08-10T08:26:56.992Z]",
+            "vsync_avgFps": 30.44,
+            "minFrameTime": 16.56,
+            "elapsedTimeSeconds": 60.15514999999999,
+            "performanceRating": "Excellent",
+            "vsync_minFps": 12.55,
+            "avgFps": 31.62,
+            "vsync_avgFrameTime": 33.55,
+            "rawDataSize": 1794,
+            "vsync_maxFps": 67.14,
+            "slowFramesCount": 29,
+            "maxFrameTime": 83.33,
+            "fpsBuckets": {
+              "bucket_16_19": 11,
+              "bucket_7_9": 0,
+              "bucket_13_16": 1,
+              "elapsedTime": 1795,
+              "bucket_11_13": 0,
+              "avgFps": 0,
+              "batteryDrain": 96,
+              "bucket_3_5": 0,
+              "bucket_22_26": 152,
+              "totalFrames": 31,
+              "endBattery": 1697,
+              "bucket_70_plus": 153,
+              "refreshRate": 96,
+              "bucket_19_22": 0,
+              "bucket_0_3": 0,
+              "bucket_35_50": 1477,
+              "bucket_5_7": 0,
+              "bucket_26_35": 0,
+              "startBattery": 60,
+              "bucket_50_70": 0,
+              "bucket_9_11": 0
+            },
+            "targetFpsConfidence": "LOW",
+            "vsync_maxFrameTime": 79.7,
+            "jankInstabilityPercentage": 13.6,
+            "hasRawData": true,
+            "fileName": "Upload 11",
+            "maxSlowFrameExcess": 33.33,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:56.992Z]",
+            "perFrameInstantaneousFps": [
+              20.03,
+              59.99,
+              30.02,
+              30.02,
+              59.89,
+              "... 1788 more items"
+            ],
+            "maxJankInstability": 66.68,
+            "slowFramePercentage": 1.6,
+            "avgFrameTime": 33.55,
+            "targetFpsScore": 27.44147157190635,
+            "vsync_minFrameTime": 14.89,
+            "perFrameInstability": [
+              0,
+              0,
+              16.65,
+              0,
+              0,
+              "... 1788 more items"
+            ],
+            "appName": "Omnigul Keyboard Glassbridge",
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              "... 1788 more items"
+            ],
+            "targetFPS": 30
+          }
+        },
+        {
+          "id": "UjFtAxJUeJwl5fklmkV8",
+          "data": {
+            "maxJankInstability": 250.4,
+            "vsync_avgFps": 17.88,
+            "targetFpsScore": 97.96610169491525,
+            "hasRawData": true,
+            "timestamp": "10/08/2025, 01:27:08",
+            "refreshRate": 60,
+            "minFps": 3.33,
+            "rawDataSize": 1003,
+            "vsync_minFps": 3.95,
+            "appName": "Voltorb2 Keyboard Lateforschool",
+            "jankInstabilityPercentage": 26.3,
+            "createdAt": "[Timestamp: 2025-08-10T08:27:08.769Z]",
+            "targetFPS": 30,
+            "perFrameActualFrameTimesMs": [
+              33.39,
+              50.15,
+              66.4,
+              33.45,
+              33.36,
+              "... 997 more items"
+            ],
+            "maxFps": 63.42,
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "avgJankInstability": 23.55,
+            "fpsBuckets": {
+              "bucket_9_11": 9,
+              "batteryDrain": 100,
+              "refreshRate": 100,
+              "startBattery": 60,
+              "bucket_26_35": 0,
+              "elapsedTime": 1004,
+              "bucket_7_9": 1,
+              "bucket_11_13": 7,
+              "bucket_16_19": 467,
+              "totalFrames": 18,
+              "bucket_5_7": 1,
+              "bucket_70_plus": 12,
+              "bucket_13_16": 96,
+              "bucket_22_26": 287,
+              "bucket_0_3": 0,
+              "bucket_50_70": 0,
+              "bucket_19_22": 0,
+              "bucket_35_50": 123,
+              "bucket_3_5": 0,
+              "avgFps": 0,
+              "endBattery": 999
+            },
+            "perFrameInstantaneousFps": [
+              29.95,
+              19.94,
+              15.06,
+              29.9,
+              29.98,
+              "... 997 more items"
+            ],
+            "slowFramesCount": 661,
+            "totalFrames": 1002,
+            "vsync_avgFrameTime": 59.87,
+            "choppinessRating": "Choppy",
+            "maxSlowFrameExcess": 249.95,
+            "minFrameTime": 15.77,
+            "performanceRating": "Poor",
+            "perFrameSlowFrameExcess": [
+              0,
+              0.15,
+              16.4,
+              0,
+              0,
+              "... 997 more items"
+            ],
+            "avgFps": 18.41,
+            "vsync_maxFrameTime": 253.47,
+            "jankInstabilityCount": 264,
+            "slowFramePercentage": 66,
+            "avgSlowFrameExcess": 18.71,
+            "targetFpsConfidence": "HIGH",
+            "vsync_maxFps": 46.96,
+            "avgFrameTime": 59.86,
+            "fileName": "Upload 18",
+            "vsync_minFrameTime": 21.3,
+            "rawFpsData": [
+              {
+                "testId": "80434c42-700a-4786-b8b8-686d25c6a97b",
+                "presentationTime": 14968172806122,
+                "deltaTime": 33,
+                "fenceTime": 14968148560276,
+                "latency": 30.7,
+                "instantFps": 30.31,
+                "vsyncTime": 14968117855814
+              },
+              {
+                "deltaTime": 33.39,
+                "latency": 32.78,
+                "vsyncTime": 14968154192122,
+                "fenceTime": 14968186973968,
+                "instantFps": 29.95,
+                "presentationTime": 14968206198506,
+                "testId": "80434c42-700a-4786-b8b8-686d25c6a97b"
+              },
+              {
+                "vsyncTime": 14968198351045,
+                "testId": "80434c42-700a-4786-b8b8-686d25c6a97b",
+                "presentationTime": 14968256349968,
+                "fenceTime": 14968228609122,
+                "deltaTime": 50.15,
+                "latency": 30.26,
+                "instantFps": 19.94
+              },
+              {
+                "presentationTime": 14968322754737,
+                "testId": "80434c42-700a-4786-b8b8-686d25c6a97b",
+                "instantFps": 15.06,
+                "vsyncTime": 14968258843199,
+                "fenceTime": 14968292971583,
+                "latency": 34.13,
+                "deltaTime": 66.4
+              },
+              {
+                "presentationTime": 14968356203353,
+                "fenceTime": 14968327619737,
+                "testId": "80434c42-700a-4786-b8b8-686d25c6a97b",
+                "deltaTime": 33.45,
+                "latency": 30.58,
+                "instantFps": 29.9,
+                "vsyncTime": 14968297037122
+              },
+              "... 998 more items"
+            ],
+            "perFrameInstability": [
+              0,
+              16.76,
+              16.25,
+              0,
+              0,
+              "... 997 more items"
+            ],
+            "deviceInfo": {
+              "ro.build.version.release": "13",
+              "ro.oem.brand": "squirtle",
+              "ro.kernel.version": "5.10",
+              "appName": "Unknown App",
+              "ro.product.board": "squirtle",
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.build.version.sdk": "33",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.product.cpu.abilist": "arm64-v8a",
+              "ro.hardware.egl": "angle",
+              "ro.product.manufacturer": "Google",
+              "appVersion": "0.0.14742",
+              "ro.product.cpu.abilist64": "arm64-v8a",
+              "ro.hwui.use_vulkan": "true",
+              "ro.soc.manufacturer": "Mediatek",
+              "dalvik.vm.heapsize": "512m",
+              "ro.lmk.use_psi": "true",
+              "ro.product.model": "corsola",
+              "ro.build.version.release_or_codename": "13",
+              "ro.hardware.vulkan": "cheets",
+              "ro.opengles.version": "196609",
+              "ro.serialno": "493CACB7ABF65DCB91E8",
+              "ro.product.cpu.abi": "arm64-v8a",
+              "ro.soc.model": "Kompanio 528 MT8186T",
+              "ro.build.fingerprint": "google/corsola/corsola_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.product.cpu.abilist32": "",
+              "MemTotal": "7324964 kB"
+            },
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:08.769Z]",
+            "elapsedTimeSeconds": 59.97972,
+            "maxFrameTime": 299.95
+          }
+        },
+        {
+          "id": "WAmmhfw3tRWaLnqTk4nV",
+          "data": {
+            "avgSlowFrameExcess": 2.33,
+            "vsync_avgFps": 30.79,
+            "perFrameSlowFrameExcess": [
+              0,
+              0,
+              0,
+              0.09,
+              0,
+              "... 1794 more items"
+            ],
+            "jankInstabilityPercentage": 21.6,
+            "refreshRate": 60,
+            "vsync_avgFrameTime": 33.46,
+            "minFrameTime": 16.46,
+            "elapsedTimeSeconds": 60.19454,
+            "vsync_minFrameTime": 14.3,
+            "jankInstabilityCount": 389,
+            "fileName": "Upload 1",
+            "vsync_minFps": 9.15,
+            "minFps": 5,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:38.608Z]",
+            "maxSlowFrameExcess": 150.03,
+            "performanceRating": "Excellent",
+            "maxJankInstability": 133.38,
+            "fpsBuckets": {
+              "bucket_5_7": 1,
+              "elapsedTime": 1801,
+              "bucket_35_50": 1169,
+              "bucket_9_11": 0,
+              "totalFrames": 33,
+              "bucket_70_plus": 322,
+              "endBattery": 1557,
+              "bucket_13_16": 5,
+              "startBattery": 60,
+              "bucket_0_3": 0,
+              "bucket_19_22": 0,
+              "bucket_11_13": 1,
+              "bucket_50_70": 0,
+              "bucket_16_19": 4,
+              "refreshRate": 100,
+              "bucket_7_9": 0,
+              "bucket_26_35": 0,
+              "bucket_22_26": 298,
+              "bucket_3_5": 0,
+              "avgFps": 0,
+              "batteryDrain": 100
+            },
+            "perFrameInstantaneousFps": [
+              29.99,
+              30.02,
+              30.01,
+              19.97,
+              60.36,
+              "... 1794 more items"
+            ],
+            "rawFpsData": [
+              {
+                "latency": 13.94,
+                "instantFps": 59.99,
+                "deltaTime": 16.67,
+                "fenceTime": 3596792839260,
+                "presentationTime": 3596808992875,
+                "testId": "6ac9e0bf-1e7c-43d3-92e0-818c920cfe03",
+                "vsyncTime": 3596778896110
+              },
+              {
+                "instantFps": 29.99,
+                "fenceTime": 3596822684459,
+                "presentationTime": 3596842339310,
+                "latency": 13.57,
+                "testId": "6ac9e0bf-1e7c-43d3-92e0-818c920cfe03",
+                "vsyncTime": 3596809114067,
+                "deltaTime": 33.35
+              },
+              {
+                "vsyncTime": 3596840826882,
+                "instantFps": 30.02,
+                "testId": "6ac9e0bf-1e7c-43d3-92e0-818c920cfe03",
+                "fenceTime": 3596854832643,
+                "latency": 14.01,
+                "deltaTime": 33.31,
+                "presentationTime": 3596875653552
+              },
+              {
+                "presentationTime": 3596908975364,
+                "fenceTime": 3596891493321,
+                "latency": 13.89,
+                "vsyncTime": 3596877602931,
+                "deltaTime": 33.32,
+                "instantFps": 30.01,
+                "testId": "6ac9e0bf-1e7c-43d3-92e0-818c920cfe03"
+              },
+              {
+                "latency": 15.68,
+                "instantFps": 19.97,
+                "fenceTime": 3596927308792,
+                "vsyncTime": 3596911632726,
+                "presentationTime": 3596959061066,
+                "testId": "6ac9e0bf-1e7c-43d3-92e0-818c920cfe03",
+                "deltaTime": 50.09
+              },
+              "... 1795 more items"
+            ],
+            "perFrameActualFrameTimesMs": [
+              33.35,
+              33.31,
+              33.32,
+              50.09,
+              16.57,
+              "... 1794 more items"
+            ],
+            "avgFps": 33.6,
+            "avgJankInstability": 27.41,
+            "perFrameInstability": [
+              0,
+              0,
+              0,
+              16.77,
+              0,
+              "... 1794 more items"
+            ],
+            "maxFrameTime": 200.03,
+            "slowFramesCount": 189,
+            "targetFPS": 30,
+            "deviceInfo": {
+              "ro.build.version.release_or_preview_display": "13",
+              "ro.oem.brand": "craaskov",
+              "appVersion": "0.0.14742",
+              "ro.opengles.version": "196609",
+              "dalvik.vm.heapgrowthlimit": "192m",
+              "ro.serialno": "5CC729EDD3D84B27BDC6",
+              "ro.build.version.release_or_codename": "13",
+              "ro.hwui.use_vulkan": "true",
+              "ro.build.version.sdk": "33",
+              "ro.product.cpu.abilist64": "x86_64,arm64-v8a",
+              "dalvik.vm.heapsize": "512m",
+              "ro.build.fingerprint": "google/nissa/nissa_cheets:13/R138-16295.54.0/13763204:user/release-keys",
+              "ro.hardware.vulkan": "cheets",
+              "appName": "Unknown App",
+              "ro.soc.model": "i3-N305",
+              "ro.hardware.gralloc": "minigbm_arcvm",
+              "ro.soc.manufacturer": "Intel",
+              "ro.kernel.version": "5.10",
+              "ro.product.manufacturer": "Google",
+              "ro.product.board": "craaskov",
+              "MemTotal": "7164556 kB",
+              "ro.product.cpu.abi": "x86_64",
+              "ro.product.model": "nissa",
+              "ro.build.version.release": "13",
+              "ro.hardware.egl": "angle",
+              "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+              "ro.lmk.use_psi": "true",
+              "ro.product.cpu.abilist32": ""
+            },
+            "maxFps": 60.74,
+            "choppinessRating": "Choppy",
+            "targetFpsScore": 24.566666666666666,
+            "createdAt": "[Timestamp: 2025-08-10T08:26:38.608Z]",
+            "targetFpsConfidence": "LOW",
+            "hasRawData": true,
+            "appName": "Crasskov Keyboard Tutorial",
+            "vsync_maxFps": 69.91,
+            "timestamp": "10/08/2025, 01:26:37",
+            "slowFramePercentage": 10.5,
+            "rawDataSize": 1800,
+            "vsync_maxFrameTime": 109.26,
+            "avgFrameTime": 33.46,
+            "totalFrames": 1799,
+            "packageName": "com.netflix.NGP.ProjectKraken"
+          }
+        }
+      ],
+      "analyzedAt": "2025-08-10T08:58:51.932Z",
+      "patterns": {
+        "hasTimestamps": true,
+        "hasIds": true,
+        "commonPrefixes": [
+          "avg",
+          "jank",
+          "per",
+          "timestamp",
+          "target",
+          "ro.product.cpu.abilist64",
+          "ro.oem.brand",
+          "ro.build.fingerprint",
+          "ro.kernel.version",
+          "ro.build.version.release_or_codename",
+          "app",
+          "ro.product.cpu.abi",
+          "ro.product.manufacturer",
+          "ro.soc.model",
+          "ro.product.cpu.abilist32",
+          "ro.hardware.egl",
+          "ro.build.version.release",
+          "ro.serialno",
+          "ro.opengles.version",
+          "ro.product.model",
+          "ro.soc.manufacturer",
+          "dalvik.vm.heapgrowthlimit",
+          "ro.hwui.use_vulkan",
+          "dalvik.vm.heapsize",
+          "ro.lmk.use_psi",
+          "ro.build.version.sdk",
+          "ro.build.version.release_or_preview_display",
+          "ro.product.cpu.abilist",
+          "ro.hardware.gralloc",
+          "ro.product.board",
+          "ro.hardware.vulkan",
+          "device",
+          "created",
+          "raw",
+          "vsync_avg",
+          "vsync_max",
+          "slow",
+          "max",
+          "min",
+          "updated",
+          "refresh",
+          "vsync_min",
+          "choppiness",
+          "file",
+          "bucket_70_plus",
+          "bucket_0_3",
+          "bucket_50_70",
+          "bucket_5_7",
+          "end",
+          "bucket_19_22",
+          "bucket_9_11",
+          "bucket_11_13",
+          "bucket_26_35",
+          "bucket_13_16",
+          "elapsed",
+          "bucket_3_5",
+          "bucket_22_26",
+          "bucket_7_9",
+          "battery",
+          "bucket_35_50",
+          "bucket_16_19",
+          "total",
+          "start",
+          "fps",
+          "performance",
+          "package",
+          "has"
+        ],
+        "dataTypes": [
+          "number",
+          "array",
+          "string",
+          "object",
+          "timestamp",
+          "boolean"
+        ]
+      }
+    },
+    "hotlists": {
+      "name": "hotlists",
+      "documentCount": 1,
+      "fields": {
+        "updatedAt": {
+          "type": "timestamp",
+          "occurrences": 1,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:44:35.515Z]"
+          ],
+          "nested": false
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "occurrences": 1,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:44:19.247Z]"
+          ],
+          "nested": false
+        },
+        "name": {
+          "type": "string",
+          "occurrences": 1,
+          "examples": [
+            "Crasskov"
+          ],
+          "nested": false
+        },
+        "totalRecords": {
+          "type": "number",
+          "occurrences": 1,
+          "examples": [
+            1
+          ],
+          "nested": false
+        },
+        "fpsDataReferences": {
+          "type": "array",
+          "occurrences": 1,
+          "examples": [
+            [
+              "WAmmhfw3tRWaLnqTk4nV"
+            ]
+          ],
+          "nested": false
+        }
+      },
+      "fieldTypes": {
+        "updatedAt": "timestamp",
+        "createdAt": "timestamp",
+        "name": "string",
+        "totalRecords": "number",
+        "fpsDataReferences": "array"
+      },
+      "requiredFields": [
+        "updatedAt",
+        "createdAt",
+        "name",
+        "totalRecords",
+        "fpsDataReferences"
+      ],
+      "optionalFields": [],
+      "sampleDocuments": [
+        {
+          "id": "3KM0bRY14vbtLtG2NeCG",
+          "data": {
+            "updatedAt": "[Timestamp: 2025-08-10T08:44:35.515Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:44:19.247Z]",
+            "name": "Crasskov",
+            "totalRecords": 1,
+            "fpsDataReferences": [
+              "WAmmhfw3tRWaLnqTk4nV"
+            ]
+          }
+        }
+      ],
+      "analyzedAt": "2025-08-10T08:58:52.236Z",
+      "patterns": {
+        "hasTimestamps": true,
+        "hasIds": false,
+        "commonPrefixes": [
+          "updated",
+          "created",
+          "name",
+          "total",
+          "fps"
+        ],
+        "dataTypes": [
+          "timestamp",
+          "string",
+          "number",
+          "array"
+        ]
+      }
+    },
+    "devices": {
+      "name": "devices",
+      "documentCount": 10,
+      "fields": {
+        "oemBrand": {
+          "type": "string",
+          "occurrences": 10,
+          "examples": [
+            "helios",
+            "craaskov",
+            "hylia"
+          ],
+          "nested": false
+        },
+        "socModels": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              "i5-10210U"
+            ],
+            [
+              "i3-N305"
+            ],
+            [
+              "MT8196"
+            ]
+          ],
+          "nested": false
+        },
+        "fpsDataReferences": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              "QZ5hhTwtgmiFISoMBoqx",
+              "oMxlMQZzD74WxOqGh9m2"
+            ],
+            [
+              "WAmmhfw3tRWaLnqTk4nV"
+            ],
+            [
+              "xS5OS8Dbewp5TiCSWlCU",
+              "Dl5drPQ9v09w1ZkTlpVH"
+            ]
+          ],
+          "nested": false
+        },
+        "totalRecords": {
+          "type": "number",
+          "occurrences": 10,
+          "examples": [
+            2,
+            1,
+            2
+          ],
+          "nested": false
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "occurrences": 10,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:26:46.485Z]",
+            "[Timestamp: 2025-08-10T08:26:39.474Z]",
+            "[Timestamp: 2025-08-10T08:26:50.286Z]"
+          ],
+          "nested": false
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "occurrences": 10,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:26:44.841Z]",
+            "[Timestamp: 2025-08-10T08:26:39.474Z]",
+            "[Timestamp: 2025-08-10T08:26:48.346Z]"
+          ],
+          "nested": false
+        },
+        "deviceBoards": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              "helios"
+            ],
+            [
+              "craaskov"
+            ],
+            [
+              "hylia"
+            ]
+          ],
+          "nested": false
+        },
+        "deviceModels": {
+          "type": "array",
+          "occurrences": 10,
+          "examples": [
+            [
+              "hatch"
+            ],
+            [
+              "nissa"
+            ],
+            [
+              "rauru"
+            ]
+          ],
+          "nested": false
+        }
+      },
+      "fieldTypes": {
+        "oemBrand": "string",
+        "socModels": "array",
+        "fpsDataReferences": "array",
+        "totalRecords": "number",
+        "updatedAt": "timestamp",
+        "createdAt": "timestamp",
+        "deviceBoards": "array",
+        "deviceModels": "array"
+      },
+      "requiredFields": [
+        "oemBrand",
+        "socModels",
+        "fpsDataReferences",
+        "totalRecords",
+        "updatedAt",
+        "createdAt",
+        "deviceBoards",
+        "deviceModels"
+      ],
+      "optionalFields": [],
+      "sampleDocuments": [
+        {
+          "id": "0ns8UY5m9Stt89hTt0VQ",
+          "data": {
+            "oemBrand": "helios",
+            "socModels": [
+              "i5-10210U"
+            ],
+            "fpsDataReferences": [
+              "QZ5hhTwtgmiFISoMBoqx",
+              "oMxlMQZzD74WxOqGh9m2"
+            ],
+            "totalRecords": 2,
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:46.485Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:26:44.841Z]",
+            "deviceBoards": [
+              "helios"
+            ],
+            "deviceModels": [
+              "hatch"
+            ]
+          }
+        },
+        {
+          "id": "11tjFsP3DLFkdb882r8c",
+          "data": {
+            "oemBrand": "craaskov",
+            "socModels": [
+              "i3-N305"
+            ],
+            "totalRecords": 1,
+            "fpsDataReferences": [
+              "WAmmhfw3tRWaLnqTk4nV"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:39.474Z]",
+            "deviceBoards": [
+              "craaskov"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:39.474Z]",
+            "deviceModels": [
+              "nissa"
+            ]
+          }
+        },
+        {
+          "id": "2uARqDYQlIPaSIImm28I",
+          "data": {
+            "oemBrand": "hylia",
+            "fpsDataReferences": [
+              "xS5OS8Dbewp5TiCSWlCU",
+              "Dl5drPQ9v09w1ZkTlpVH"
+            ],
+            "deviceBoards": [
+              "hylia"
+            ],
+            "totalRecords": 2,
+            "deviceModels": [
+              "rauru"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:50.286Z]",
+            "socModels": [
+              "MT8196"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:48.346Z]"
+          }
+        },
+        {
+          "id": "9PDZmsLaOMzl9mXvgLsc",
+          "data": {
+            "totalRecords": 1,
+            "fpsDataReferences": [
+              "UjFtAxJUeJwl5fklmkV8"
+            ],
+            "deviceModels": [
+              "corsola"
+            ],
+            "deviceBoards": [
+              "squirtle"
+            ],
+            "socModels": [
+              "Kompanio 528 MT8186T"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:09.673Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:27:09.673Z]",
+            "oemBrand": "squirtle"
+          }
+        },
+        {
+          "id": "9PVvkpgmF6gWyYQnxAyK",
+          "data": {
+            "deviceModels": [
+              "brya"
+            ],
+            "oemBrand": "osiris",
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:01.492Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:27:01.492Z]",
+            "totalRecords": 1,
+            "socModels": [
+              "5 120U"
+            ],
+            "fpsDataReferences": [
+              "zo6uGChr7gZVYo1Ka77j"
+            ],
+            "deviceBoards": [
+              "osiris"
+            ]
+          }
+        },
+        {
+          "id": "AJ6zzmNndasbdO3030xk",
+          "data": {
+            "deviceBoards": [
+              "omnigul"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:57.915Z]",
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:59.688Z]",
+            "totalRecords": 2,
+            "deviceModels": [
+              "brya"
+            ],
+            "oemBrand": "omnigul",
+            "socModels": [
+              "i3-1315U"
+            ],
+            "fpsDataReferences": [
+              "TwlPQGSSpv9Y92SpN62m",
+              "7cmkWkkKUO5GsqC0B8W1"
+            ]
+          }
+        },
+        {
+          "id": "DdzqCCYPhyM8LTDBH9ds",
+          "data": {
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:41.438Z]",
+            "deviceBoards": [
+              "dochi"
+            ],
+            "totalRecords": 1,
+            "socModels": [
+              "3 100U"
+            ],
+            "deviceModels": [
+              "brya"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:41.438Z]",
+            "oemBrand": "dochi",
+            "fpsDataReferences": [
+              "z8xHwKAltQ8oAUrP08xC"
+            ]
+          }
+        },
+        {
+          "id": "WJcfL7SDn7UqmN8lDv5k",
+          "data": {
+            "deviceModels": [
+              "nissa"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:43.182Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:26:43.182Z]",
+            "oemBrand": "glassway",
+            "totalRecords": 1,
+            "fpsDataReferences": [
+              "sZb8Wer8zDArfXWC6Bgl"
+            ],
+            "deviceBoards": [
+              "glassway"
+            ],
+            "socModels": [
+              "i3-N305"
+            ]
+          }
+        },
+        {
+          "id": "WSft6htfnvksF7ApWcK8",
+          "data": {
+            "totalRecords": 1,
+            "deviceBoards": [
+              "navi"
+            ],
+            "fpsDataReferences": [
+              "xuexnLEEMiHab9wjQ9nJ"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:55.942Z]",
+            "deviceModels": [
+              "rauru"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:55.942Z]",
+            "socModels": [
+              "MT8196"
+            ],
+            "oemBrand": "navi"
+          }
+        },
+        {
+          "id": "infAnHc8FaiO7iqgXoQE",
+          "data": {
+            "totalRecords": 2,
+            "fpsDataReferences": [
+              "CEOz5GIoD7u7Dc4tQfcu",
+              "NeFbl8rN1fmG0jm1fKTW"
+            ],
+            "updatedAt": "[Timestamp: 2025-08-10T08:26:54.005Z]",
+            "deviceModels": [
+              "trogdor"
+            ],
+            "oemBrand": "lazor",
+            "socModels": [
+              "SC7180"
+            ],
+            "createdAt": "[Timestamp: 2025-08-10T08:26:52.363Z]",
+            "deviceBoards": [
+              "lazor"
+            ]
+          }
+        }
+      ],
+      "analyzedAt": "2025-08-10T08:58:52.821Z",
+      "patterns": {
+        "hasTimestamps": true,
+        "hasIds": false,
+        "commonPrefixes": [
+          "oem",
+          "soc",
+          "fps",
+          "total",
+          "updated",
+          "created",
+          "device"
+        ],
+        "dataTypes": [
+          "string",
+          "array",
+          "number",
+          "timestamp"
+        ]
+      }
+    },
+    "package_names": {
+      "name": "package_names",
+      "documentCount": 1,
+      "fields": {
+        "packageName": {
+          "type": "string",
+          "occurrences": 1,
+          "examples": [
+            "com.netflix.NGP.ProjectKraken"
+          ],
+          "nested": false
+        },
+        "appName": {
+          "type": "string",
+          "occurrences": 1,
+          "examples": [
+            "Voltorb2 Keyboard Lateforschool"
+          ],
+          "nested": false
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "occurrences": 1,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:27:10.042Z]"
+          ],
+          "nested": false
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "occurrences": 1,
+          "examples": [
+            "[Timestamp: 2025-08-10T08:26:39.818Z]"
+          ],
+          "nested": false
+        },
+        "totalRecords": {
+          "type": "number",
+          "occurrences": 1,
+          "examples": [
+            18
+          ],
+          "nested": false
+        },
+        "fpsDataReferences": {
+          "type": "array",
+          "occurrences": 1,
+          "examples": [
+            [
+              "WAmmhfw3tRWaLnqTk4nV",
+              "z8xHwKAltQ8oAUrP08xC",
+              "sZb8Wer8zDArfXWC6Bgl",
+              "QZ5hhTwtgmiFISoMBoqx",
+              "oMxlMQZzD74WxOqGh9m2",
+              "... 13 more items"
+            ]
+          ],
+          "nested": false
+        }
+      },
+      "fieldTypes": {
+        "packageName": "string",
+        "appName": "string",
+        "updatedAt": "timestamp",
+        "createdAt": "timestamp",
+        "totalRecords": "number",
+        "fpsDataReferences": "array"
+      },
+      "requiredFields": [
+        "packageName",
+        "appName",
+        "updatedAt",
+        "createdAt",
+        "totalRecords",
+        "fpsDataReferences"
+      ],
+      "optionalFields": [],
+      "sampleDocuments": [
+        {
+          "id": "WLbleAcmLNJJwK10S9J5",
+          "data": {
+            "packageName": "com.netflix.NGP.ProjectKraken",
+            "appName": "Voltorb2 Keyboard Lateforschool",
+            "updatedAt": "[Timestamp: 2025-08-10T08:27:10.042Z]",
+            "createdAt": "[Timestamp: 2025-08-10T08:26:39.818Z]",
+            "totalRecords": 18,
+            "fpsDataReferences": [
+              "WAmmhfw3tRWaLnqTk4nV",
+              "z8xHwKAltQ8oAUrP08xC",
+              "sZb8Wer8zDArfXWC6Bgl",
+              "QZ5hhTwtgmiFISoMBoqx",
+              "oMxlMQZzD74WxOqGh9m2",
+              "... 13 more items"
+            ]
+          }
+        }
+      ],
+      "analyzedAt": "2025-08-10T08:58:53.107Z",
+      "patterns": {
+        "hasTimestamps": true,
+        "hasIds": false,
+        "commonPrefixes": [
+          "package",
+          "app",
+          "updated",
+          "created",
+          "total",
+          "fps"
+        ],
+        "dataTypes": [
+          "string",
+          "timestamp",
+          "number",
+          "array"
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "analyzedAt": "2025-08-10T08:57:45.945Z",
+    "totalCollections": 4,
+    "totalDocuments": 22,
+    "projectId": "fps-dashboard"
+  }
+}

@@ -8,6 +8,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/hotlist-enhanced.css" />
+    <link rel="stylesheet" href="css/chatbot.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
@@ -505,6 +506,13 @@
         border-radius: 15px;
         font-size: 0.8rem;
         border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+      }
+
+      .selected-count:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: var(--primary-color);
+        transform: translateY(-1px);
       }
 
       /* Comparison Modal Styles */
@@ -1943,6 +1951,14 @@
           </div>
         </button>
 
+        <button class="nav-item" id="navChatbot" data-view="chatbot">
+          <span class="nav-icon">🤖</span>
+          <div>
+            <div class="nav-text">AI Chatbot</div>
+            <div class="nav-description">Analyze performance with AI</div>
+          </div>
+        </button>
+
         <button class="nav-item" id="navFirebase" data-view="firebase">
           <span class="nav-icon">🔥</span>
           <div>
@@ -2507,6 +2523,65 @@
         </div>
       </div>
 
+      <!-- AI Chatbot Section -->
+      <div class="dashboard-section" id="chatbotSection" style="display: none">
+        <div class="analysis-header">
+          <div class="view-controls">
+            <button id="newChatBtn" class="btn btn-secondary">➕ New Chat</button>
+            <button id="chatHistoryBtn" class="btn btn-secondary">📋 History</button>
+            <button id="clearChatBtn" class="btn btn-secondary">🗑️ Clear</button>
+            <span id="chatbotResultsCount" class="results-count">Ask questions about your performance data</span>
+          </div>
+        </div>
+
+        <!-- Chatbot Interface -->
+        <div class="chatbot-container">
+          <!-- Chat Messages Area -->
+          <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be loaded dynamically -->
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button class="quick-action-btn" onclick="sendQuickMessage('Analyze my latest performance data')">
+              📊 Analyze Latest Data
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickMessage('What is causing performance drops?')">
+              🔍 Find Bottlenecks
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickMessage('Compare my recent runs')">
+              📈 Compare Runs
+            </button>
+            <button class="quick-action-btn" onclick="sendQuickMessage('How can I improve FPS?')">
+              💡 Get Recommendations
+            </button>
+          </div>
+
+          <!-- Message Input -->
+          <div class="chat-input-container">
+            <!-- Referenced Runs Chips -->
+            <div class="referenced-runs-chips" id="referencedRunsChips"></div>
+            
+            <div class="chat-input-wrapper">
+              <button class="run-reference-btn" id="runReferenceBtn" title="Reference existing runs">
+                🔗
+              </button>
+              <textarea 
+                id="chatInput" 
+                placeholder="Ask me about your performance data..."
+                rows="1"
+              ></textarea>
+              <button class="send-btn" id="sendBtn" title="Send message">
+                ➤
+              </button>
+            </div>
+            <div class="input-hint">
+              Press Enter to send, Shift+Enter for new line, or reference runs with 🔗
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Firebase Section -->
       <div class="dashboard-section" id="firebaseSection" style="display: none">
         <div class="analysis-header">
@@ -2631,13 +2706,21 @@
 
     <!-- Compare Controls (Floating Action Button) -->
     <div class="compare-controls" id="compareControls">
-      <div class="selected-count" id="selectedCount">2 selected</div>
+      <div class="selected-count" id="selectedCount" onclick="openSelectionDetailsModal()" style="cursor: pointer;" title="Click to view selected items">2 selected</div>
       <button
         class="compare-btn"
         id="compareBtn"
         onclick="openComparisonModal()"
       >
         📊 Compare Apps
+      </button>
+      <button
+        class="compare-btn"
+        id="deleteSelectedBtn"
+        onclick="deleteSelectedItems()"
+        style="background: var(--error-color); display: none;"
+      >
+        🗑️ Delete Selected
       </button>
     </div>
 
@@ -2803,6 +2886,50 @@
                   <!-- Metrics will be populated by JavaScript -->
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selection Details Modal -->
+    <div class="analysis-modal" id="selectionDetailsModal">
+      <div class="analysis-modal-content" style="max-width: 800px;">
+        <div class="analysis-modal-header">
+          <h2 class="analysis-modal-title">📋 Selected Items</h2>
+          <button class="close-modal-btn" id="closeSelectionDetailsBtn">&times;</button>
+        </div>
+
+        <div class="analysis-sections">
+          <!-- Selected Items List -->
+          <div class="analysis-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h3 class="analysis-section-title" style="margin: 0;">
+                <span id="selectionDetailsCount">0</span> Items Selected
+              </h3>
+              <div style="display: flex; gap: 10px;">
+                <button id="clearAllSelectionBtn" class="btn btn-secondary">Clear All</button>
+                <button id="bulkDeleteFromSelectionBtn" class="btn" style="background: var(--error-color); color: white;">Delete All</button>
+              </div>
+            </div>
+            <div id="selectionDetailsList">
+              <!-- Selected items will appear here -->
+            </div>
+          </div>
+
+          <!-- Bulk Actions -->
+          <div class="analysis-section">
+            <h3 class="analysis-section-title">⚡ Bulk Actions</h3>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+              <button id="compareSelectedFromModal" class="upload-btn" style="min-width: 150px;">
+                📊 Compare Selected
+              </button>
+              <button id="exportSelectedData" class="btn btn-secondary" style="min-width: 150px;">
+                📤 Export Data
+              </button>
+              <button id="addToHotlistBulk" class="btn btn-secondary" style="min-width: 150px;">
+                🏷️ Add to Hotlist
+              </button>
             </div>
           </div>
         </div>
@@ -2979,6 +3106,96 @@
         </div>
       </div>
     </div>
+    <!-- Run Reference Modal -->
+    <div class="analysis-modal" id="runReferenceModal">
+      <div class="analysis-modal-content" style="max-width: 1000px;">
+        <div class="analysis-modal-header">
+          <h2 class="analysis-modal-title">🔗 Reference Performance Runs</h2>
+          <button class="close-modal-btn" id="closeRunReferenceBtn">&times;</button>
+        </div>
+
+        <div class="analysis-sections">
+          <!-- Search and Filter -->
+          <div class="analysis-section">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <input 
+                type="text" 
+                id="runReferenceSearch" 
+                placeholder="Search by app name, device, or package..."
+                style="flex: 1; padding: 10px 15px; border-radius: var(--btn-radius); border: 1px solid var(--border-color); background: var(--input-bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif;"
+              />
+              <button id="clearRunReferenceSearch" class="btn btn-secondary">Clear</button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+              <span style="color: var(--text-secondary); font-size: 0.9rem; align-self: center;">Quick filters:</span>
+              <button class="btn btn-secondary" onclick="filterRunsByTimeframe('today')">Today</button>
+              <button class="btn btn-secondary" onclick="filterRunsByTimeframe('week')">This Week</button>
+              <button class="btn btn-secondary" onclick="filterRunsByTimeframe('month')">This Month</button>
+              <button class="btn btn-secondary" onclick="clearRunReferenceFilters()">Show All</button>
+            </div>
+          </div>
+
+          <!-- Selected Runs -->
+          <div class="analysis-section" id="selectedRunsSection" style="display: none;">
+            <h3 class="analysis-section-title">✅ Selected Runs (<span id="selectedRunsCount">0</span>)</h3>
+            <div id="selectedRunsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+              <!-- Selected runs chips will appear here -->
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button id="addSelectedRunsBtn" class="upload-btn">Add Selected Runs</button>
+              <button id="clearSelectedRunsBtn" class="btn btn-secondary">Clear Selection</button>
+            </div>
+          </div>
+
+          <!-- Available Runs Table -->
+          <div class="analysis-section">
+            <h3 class="analysis-section-title">📊 Available Runs</h3>
+            <div class="table-container" style="max-height: 400px;">
+              <table class="dashboard-table" id="runReferenceTable">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">Select</th>
+                    <th>App Name</th>
+                    <th>Package Name</th>
+                    <th>Avg FPS</th>
+                    <th>Device</th>
+                    <th>Duration</th>
+                    <th>Upload Time</th>
+                  </tr>
+                </thead>
+                <tbody id="runReferenceTableBody">
+                  <!-- Runs will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat History Modal -->
+    <div class="analysis-modal" id="chatHistoryModal">
+      <div class="analysis-modal-content" style="max-width: 800px;">
+        <div class="analysis-modal-header">
+          <h2 class="analysis-modal-title">📋 Chat History</h2>
+          <button class="close-modal-btn" id="closeChatHistoryBtn">&times;</button>
+        </div>
+
+        <div class="analysis-sections">
+          <!-- Chat Sessions List -->
+          <div class="analysis-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h3 class="analysis-section-title" style="margin: 0;">💬 Previous Chat Sessions</h3>
+              <button id="deleteAllChatsBtn" class="btn" style="background: var(--error-color); color: white;">Delete All</button>
+            </div>
+            <div id="chatHistoryList">
+              <!-- Chat history items will appear here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="globalTooltip" class="tooltip-text"></div>
     <script type="module" src="js/main.js"></script>
   </body>

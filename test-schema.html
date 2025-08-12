@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Schema Analyzer Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .output {
+        background: #1e1e1e;
+        color: #f8f8f2;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.4;
+        max-height: 500px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin-top: 20px;
+        border: 1px solid #333;
+      }
+
+      .status {
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-weight: 600;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .schema-info {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .schema-info h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+
+      .clear-btn {
+        background: #dc3545;
+        float: right;
+        padding: 8px 15px;
+        font-size: 12px;
+      }
+
+      .clear-btn:hover {
+        background: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔥 Firebase Schema Analyzer</h1>
+
+      <div class="schema-info">
+        <h3>📊 Schema Analysis Tools</h3>
+        <p>
+          This tool analyzes your Firebase Firestore database structure and
+          provides detailed insights about your collections, fields, and data
+          patterns.
+        </p>
+        <p id="collections-info">
+          <strong>Collections:</strong>
+          <span id="collections-list">Loading...</span>
+        </p>
+      </div>
+
+      <div class="button-grid">
+        <button onclick="runQuickOverview()">⚡ Quick Overview</button>
+        <button onclick="runCompleteAnalysis()">📊 Complete Analysis</button>
+        <button onclick="generateCleanSchema()">🧹 Clean Schema</button>
+        <button onclick="compareCollections()">🔄 Compare Collections</button>
+        <button onclick="testValidation()">🧪 Test Validation</button>
+        <button onclick="generateReport()">📋 Generate Report</button>
+        <button onclick="exportSchema()">💾 Export Schema</button>
+        <button onclick="analyzeSpecificCollection()">
+          🔍 Analyze FPS Data
+        </button>
+        <button onclick="monitorChanges()">📈 Monitor Changes</button>
+      </div>
+
+      <button class="clear-btn" onclick="clearOutput()">🗑️ Clear Output</button>
+
+      <div id="status"></div>
+      <div id="output" class="output">
+        Ready to analyze Firebase schema...\n\nClick any button above to start
+        analysis.
+      </div>
+    </div>
+
+    <script type="module">
+      import { SchemaDemo } from "./js/schema-demo.js";
+      import {
+        schemaAnalyzer,
+        getFirebaseSchema,
+        generateSchemaReport,
+        exportSchema,
+      } from "./js/firebase-schema-analyzer.js";
+
+      // Make functions available globally
+      window.SchemaDemo = SchemaDemo;
+      window.schemaAnalyzer = schemaAnalyzer;
+      window.getFirebaseSchema = getFirebaseSchema;
+      window.generateSchemaReport = generateSchemaReport;
+      window.exportSchema = exportSchema;
+
+      // Utility functions
+      function showStatus(message, type = "info") {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        setTimeout(() => {
+          statusDiv.innerHTML = "";
+        }, 5000);
+      }
+
+      function showLoading(message) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerHTML = `<div class="status info"><span class="loading"></span>${message}</div>`;
+      }
+
+      function appendOutput(text) {
+        const output = document.getElementById("output");
+        output.textContent += "\n" + text;
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function setOutput(text) {
+        const output = document.getElementById("output");
+        output.textContent = text;
+      }
+
+      // Make utility functions global
+      window.showStatus = showStatus;
+      window.showLoading = showLoading;
+      window.appendOutput = appendOutput;
+      window.setOutput = setOutput;
+
+      // Analysis functions
+      window.runQuickOverview = async function () {
+        try {
+          showLoading("Running quick schema overview...");
+          setOutput("🚀 Starting Quick Schema Overview...\n");
+
+          const result = await SchemaDemo.quickOverview();
+          showStatus("Quick overview completed successfully!", "success");
+        } catch (error) {
+          console.error("Quick overview failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Quick overview failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.runCompleteAnalysis = async function () {
+        try {
+          showLoading("Running complete schema analysis...");
+          setOutput("🚀 Starting Complete Schema Analysis...\n");
+
+          const result = await SchemaDemo.runCompleteDemo();
+          showStatus("Complete analysis finished successfully!", "success");
+        } catch (error) {
+          console.error("Complete analysis failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Complete analysis failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.compareCollections = async function () {
+        try {
+          showLoading("Comparing collection schemas...");
+          setOutput("🔄 Comparing Collection Schemas...\n");
+
+          const result = await SchemaDemo.compareCollections();
+          showStatus("Collection comparison completed!", "success");
+        } catch (error) {
+          console.error("Collection comparison failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Collection comparison failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.testValidation = async function () {
+        try {
+          showLoading("Testing data validation...");
+          setOutput("🧪 Testing Data Validation...\n");
+
+          const result = await SchemaDemo.testDataValidation();
+          showStatus("Data validation test completed!", "success");
+        } catch (error) {
+          console.error("Validation test failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Validation test failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.generateCleanSchema = async function () {
+        try {
+          showLoading("Generating clean schema (fields and types only)...");
+          setOutput("🧹 Generating Clean Schema...\n");
+
+          const cleanSchema = await schemaAnalyzer.getCleanSchema();
+          const cleanReport =
+            schemaAnalyzer.generateCleanSchemaReport(cleanSchema);
+          setOutput(cleanReport);
+          showStatus("Clean schema generated successfully!", "success");
+        } catch (error) {
+          console.error("Clean schema generation failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Clean schema generation failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.generateReport = async function () {
+        try {
+          showLoading("Generating schema report...");
+          setOutput("📋 Generating Schema Report...\n");
+
+          const report = await generateSchemaReport();
+          setOutput(report);
+          showStatus("Schema report generated successfully!", "success");
+        } catch (error) {
+          console.error("Report generation failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Report generation failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.exportSchema = async function () {
+        try {
+          showLoading("Exporting schema...");
+          appendOutput("\n💾 Exporting Schema...\n");
+
+          const result = await SchemaDemo.exportSchemaFile();
+          showStatus(
+            "Schema exported successfully! Check your downloads.",
+            "success"
+          );
+        } catch (error) {
+          console.error("Schema export failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Schema export failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.analyzeSpecificCollection = async function () {
+        try {
+          showLoading("Analyzing FPS data collection...");
+          setOutput("🔍 Analyzing FPS Data Collection...\n");
+
+          const schema = await schemaAnalyzer.getCollectionSchema("fps_data");
+          if (schema) {
+            const output = `
+📁 FPS_DATA COLLECTION ANALYSIS
+===============================
+
+📊 Basic Info:
+- Collection: ${schema.name}
+- Documents Analyzed: ${schema.documentCount}
+- Total Fields: ${Object.keys(schema.fields).length}
+- Required Fields: ${schema.requiredFields.length}
+- Optional Fields: ${schema.optionalFields.length}
+
+🔑 Required Fields:
+${schema.requiredFields
+  .map((field) => `  • ${field} (${schema.fieldTypes[field]})`)
+  .join("\n")}
+
+⚙️ Optional Fields:
+${schema.optionalFields
+  .map((field) => `  • ${field} (${schema.fieldTypes[field]})`)
+  .join("\n")}
+
+🎯 Patterns Detected:
+- Has Timestamps: ${schema.patterns.hasTimestamps ? "✅" : "❌"}
+- Has ID Fields: ${schema.patterns.hasIds ? "✅" : "❌"}
+- Data Types: ${schema.patterns.dataTypes.join(", ")}
+
+📝 Field Details:
+${Object.entries(schema.fields)
+  .map(
+    ([field, info]) =>
+      `  • ${field}: ${info.type} (${info.occurrences}/${schema.documentCount} docs)`
+  )
+  .join("\n")}
+`;
+            setOutput(output);
+            showStatus("FPS data collection analysis completed!", "success");
+          } else {
+            appendOutput("\n⚠️ FPS data collection is empty or not found.");
+            showStatus("FPS data collection not found.", "error");
+          }
+        } catch (error) {
+          console.error("Collection analysis failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Collection analysis failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.monitorChanges = async function () {
+        try {
+          showLoading("Monitoring schema changes...");
+          setOutput("📈 Monitoring Schema Changes...\n");
+
+          const baseline = JSON.parse(
+            localStorage.getItem("firebase_schema_baseline") || "null"
+          );
+          const result = await SchemaDemo.monitorSchemaChanges(baseline);
+          showStatus("Schema monitoring completed!", "success");
+        } catch (error) {
+          console.error("Schema monitoring failed:", error);
+          appendOutput(`\n❌ Error: ${error.message}`);
+          showStatus(
+            "Schema monitoring failed. Check console for details.",
+            "error"
+          );
+        }
+      };
+
+      window.clearOutput = function () {
+        setOutput("Output cleared. Ready for new analysis...");
+        showStatus("Output cleared.", "info");
+      };
+
+      // Override console.log to show in output
+      const originalLog = console.log;
+      console.log = function (...args) {
+        originalLog.apply(console, args);
+        const message = args
+          .map((arg) =>
+            typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+          )
+          .join(" ");
+        appendOutput(message);
+      };
+
+      // Function to load and display collections dynamically
+      async function loadCollections() {
+        try {
+          const collectionsListElement =
+            document.getElementById("collections-list");
+          collectionsListElement.textContent = "Discovering...";
+
+          // Discover collections dynamically
+          const discoveredCollections =
+            await schemaAnalyzer.discoverCollections();
+
+          if (discoveredCollections.length > 0) {
+            collectionsListElement.textContent =
+              discoveredCollections.join(", ");
+            showStatus(
+              `Discovered ${
+                discoveredCollections.length
+              } collections: ${discoveredCollections.join(", ")}`,
+              "success"
+            );
+          } else {
+            collectionsListElement.textContent = "No collections found";
+            showStatus("No collections discovered in the database", "info");
+          }
+        } catch (error) {
+          console.error("Error discovering collections:", error);
+          const collectionsListElement =
+            document.getElementById("collections-list");
+          collectionsListElement.textContent = "Error loading collections";
+          showStatus(
+            "Failed to discover collections. Check console for details.",
+            "error"
+          );
+        }
+      }
+
+      // Load collections when page loads
+      window.addEventListener("load", async () => {
+        await loadCollections();
+      });
+
+      // Show initial status
+      showStatus("Firebase Schema Analyzer loaded successfully!", "success");
+    </script>
+  </body>
+</html>

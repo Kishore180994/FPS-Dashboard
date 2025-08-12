@@ -318,7 +318,7 @@ function createHotlist() {
 }
 
 // Save edit hotlist
-function saveEditHotlist(hotlistId) {
+async function saveEditHotlist(hotlistId) {
   const name = document.getElementById("editHotlistName").value.trim();
   const description = document
     .getElementById("editHotlistDescription")
@@ -331,7 +331,7 @@ function saveEditHotlist(hotlistId) {
   }
 
   try {
-    HotlistManager.updateHotlist(hotlistId, { name, description });
+    await HotlistManager.updateHotlist(hotlistId, { name, description });
     showToast("Hotlist updated successfully!", "success");
     closeModal();
     updateHotlistView();
@@ -544,7 +544,7 @@ function toggleRunInHotlist(hotlistId, runIndex, isChecked) {
 }
 
 // Delete hotlist
-function deleteHotlist(hotlistId) {
+async function deleteHotlist(hotlistId) {
   const hotlist = HotlistManager.getHotlistById(hotlistId);
   if (!hotlist) return;
 
@@ -554,7 +554,7 @@ function deleteHotlist(hotlistId) {
     )
   ) {
     try {
-      HotlistManager.deleteHotlist(hotlistId);
+      await HotlistManager.deleteHotlist(hotlistId);
 
       // Clear filter if this hotlist was active
       if (currentFilter === hotlistId) {

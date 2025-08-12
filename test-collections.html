@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FPS Dashboard - Collections Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      .collection-section {
+        margin-bottom: 30px;
+      }
+      .collection-item {
+        background: #f8f9fa;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .stat-card {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+      }
+      .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .loading {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+      }
+      .error {
+        color: #dc3545;
+        background: #f8d7da;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .success {
+        color: #155724;
+        background: #d4edda;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .reference-list {
+        max-height: 200px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 10px;
+        margin-top: 10px;
+      }
+      .reference-item {
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>FPS Dashboard - Collections Demo</h1>
+      <p>
+        This demo showcases the new Firebase collections structure with proper
+        referencing for better data organization and indexing.
+      </p>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="totalFpsRecords">-</div>
+          <div class="stat-label">Total FPS Records</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalDevices">-</div>
+          <div class="stat-label">Device Brands</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalPackages">-</div>
+          <div class="stat-label">Package Names</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalHotlists">-</div>
+          <div class="stat-label">Hotlists</div>
+        </div>
+      </div>
+
+      <button onclick="loadAllCollections()">Load All Collections</button>
+      <button onclick="testCollectionOperations()">
+        Test Collection Operations
+      </button>
+      <button onclick="clearDisplay()">Clear Display</button>
+    </div>
+
+    <div class="container">
+      <div class="collection-section">
+        <h2>Device Collections (by OEM Brand)</h2>
+        <div id="devicesContainer" class="loading">
+          Click "Load All Collections" to view devices...
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="collection-section">
+        <h2>Package Name Collections</h2>
+        <div id="packagesContainer" class="loading">
+          Click "Load All Collections" to view packages...
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="collection-section">
+        <h2>Hotlist Collections</h2>
+        <div id="hotlistsContainer" class="loading">
+          Click "Load All Collections" to view hotlists...
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="collection-section">
+        <h2>Test Results</h2>
+        <div id="testResults"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { firebaseService } from "./js/firebase-service.js";
+
+      let allCollectionsData = {
+        devices: [],
+        packages: [],
+        hotlists: [],
+        fpsData: [],
+      };
+
+      window.loadAllCollections = async function () {
+        try {
+          showLoading();
+
+          // Load all collections
+          const [devices, packages, hotlists, fpsData] = await Promise.all([
+            firebaseService.getAllDevices(),
+            firebaseService.getAllPackageNames(),
+            firebaseService.loadAllHotlists(),
+            firebaseService.loadAllFPSData(50), // Limit to 50 for demo
+          ]);
+
+          allCollectionsData = { devices, packages, hotlists, fpsData };
+
+          // Update stats
+          document.getElementById("totalFpsRecords").textContent =
+            fpsData.length;
+          document.getElementById("totalDevices").textContent = devices.length;
+          document.getElementById("totalPackages").textContent =
+            packages.length;
+          document.getElementById("totalHotlists").textContent =
+            hotlists.length;
+
+          // Display collections
+          displayDevices(devices);
+          displayPackages(packages);
+          displayHotlists(hotlists);
+
+          showSuccess("All collections loaded successfully!");
+        } catch (error) {
+          console.error("Error loading collections:", error);
+          showError("Failed to load collections: " + error.message);
+        }
+      };
+
+      function displayDevices(devices) {
+        const container = document.getElementById("devicesContainer");
+        if (devices.length === 0) {
+          container.innerHTML = "<p>No device collections found.</p>";
+          return;
+        }
+
+        container.innerHTML = devices
+          .map(
+            (device) => `
+                <div class="collection-item">
+                    <h3>${device.oemBrand}</h3>
+                    <p><strong>Total Records:</strong> ${
+                      device.totalRecords
+                    }</p>
+                    <p><strong>Device Models:</strong> ${device.deviceModels.join(
+                      ", "
+                    )}</p>
+                    <p><strong>Device Boards:</strong> ${device.deviceBoards.join(
+                      ", "
+                    )}</p>
+                    <p><strong>SoC Models:</strong> ${device.socModels.join(
+                      ", "
+                    )}</p>
+                    <p><strong>Created:</strong> ${new Date(
+                      device.createdAt
+                    ).toLocaleString()}</p>
+                    <p><strong>Updated:</strong> ${new Date(
+                      device.updatedAt
+                    ).toLocaleString()}</p>
+                    <details>
+                        <summary>FPS Data References (${
+                          device.fpsDataReferences.length
+                        })</summary>
+                        <div class="reference-list">
+                            ${device.fpsDataReferences
+                              .map(
+                                (ref) =>
+                                  `<div class="reference-item">${ref}</div>`
+                              )
+                              .join("")}
+                        </div>
+                    </details>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function displayPackages(packages) {
+        const container = document.getElementById("packagesContainer");
+        if (packages.length === 0) {
+          container.innerHTML = "<p>No package name collections found.</p>";
+          return;
+        }
+
+        container.innerHTML = packages
+          .map(
+            (pkg) => `
+                <div class="collection-item">
+                    <h3>${pkg.packageName}</h3>
+                    <p><strong>App Name:</strong> ${pkg.appName}</p>
+                    <p><strong>Total Records:</strong> ${pkg.totalRecords}</p>
+                    <p><strong>Created:</strong> ${new Date(
+                      pkg.createdAt
+                    ).toLocaleString()}</p>
+                    <p><strong>Updated:</strong> ${new Date(
+                      pkg.updatedAt
+                    ).toLocaleString()}</p>
+                    <details>
+                        <summary>FPS Data References (${
+                          pkg.fpsDataReferences.length
+                        })</summary>
+                        <div class="reference-list">
+                            ${pkg.fpsDataReferences
+                              .map(
+                                (ref) =>
+                                  `<div class="reference-item">${ref}</div>`
+                              )
+                              .join("")}
+                        </div>
+                    </details>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function displayHotlists(hotlists) {
+        const container = document.getElementById("hotlistsContainer");
+        if (hotlists.length === 0) {
+          container.innerHTML = "<p>No hotlist collections found.</p>";
+          return;
+        }
+
+        container.innerHTML = hotlists
+          .map(
+            (hotlist) => `
+                <div class="collection-item">
+                    <h3>${hotlist.name}</h3>
+                    <p><strong>Total Records:</strong> ${
+                      hotlist.totalRecords ||
+                      hotlist.fpsDataReferences?.length ||
+                      0
+                    }</p>
+                    <p><strong>Created:</strong> ${new Date(
+                      hotlist.createdAt
+                    ).toLocaleString()}</p>
+                    <p><strong>Updated:</strong> ${new Date(
+                      hotlist.updatedAt
+                    ).toLocaleString()}</p>
+                    ${
+                      hotlist.fpsDataReferences
+                        ? `
+                        <details>
+                            <summary>FPS Data References (${
+                              hotlist.fpsDataReferences.length
+                            })</summary>
+                            <div class="reference-list">
+                                ${hotlist.fpsDataReferences
+                                  .map(
+                                    (ref) =>
+                                      `<div class="reference-item">${ref}</div>`
+                                  )
+                                  .join("")}
+                            </div>
+                        </details>
+                    `
+                        : ""
+                    }
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      window.testCollectionOperations = async function () {
+        const resultsContainer = document.getElementById("testResults");
+        resultsContainer.innerHTML =
+          '<div class="loading">Running collection tests...</div>';
+
+        const results = [];
+
+        try {
+          // Test 1: Create a sample FPS data record
+          results.push(
+            "🧪 Test 1: Creating sample FPS data with collection references..."
+          );
+
+          const sampleFpsData = {
+            appName: "Test App Demo",
+            packageName: "com.test.demo",
+            avgFps: 58.5,
+            deviceInfo: {
+              "ro.oem.brand": "TestBrand",
+              "ro.product.model": "TestDevice",
+              "ro.product.board": "TestBoard",
+              "ro.soc.model": "TestSoC",
+            },
+            rawFpsData: [
+              { testId: "test1", presentationTime: 1000, vsyncTime: 1000 },
+              { testId: "test2", presentationTime: 2000, vsyncTime: 2000 },
+            ],
+          };
+
+          const fpsDataId = await firebaseService.saveFPSData(sampleFpsData);
+          results.push(`✅ Created FPS data with ID: ${fpsDataId}`);
+
+          // Test 2: Verify device collection was updated
+          results.push("🧪 Test 2: Verifying device collection update...");
+          const deviceCollection = await firebaseService.getDeviceByOEM(
+            "TestBrand"
+          );
+          if (
+            deviceCollection &&
+            deviceCollection.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Device collection updated successfully");
+          } else {
+            results.push("❌ Device collection update failed");
+          }
+
+          // Test 3: Verify package name collection was updated
+          results.push(
+            "🧪 Test 3: Verifying package name collection update..."
+          );
+          const packageCollection = await firebaseService.getPackageByName(
+            "com.test.demo"
+          );
+          if (
+            packageCollection &&
+            packageCollection.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Package name collection updated successfully");
+          } else {
+            results.push("❌ Package name collection update failed");
+          }
+
+          // Test 4: Test hotlist operations
+          results.push("🧪 Test 4: Testing hotlist collection operations...");
+          await firebaseService.addToHotlistCollection(
+            "Test Hotlist",
+            fpsDataId
+          );
+          const hotlistCollection = await firebaseService.getHotlistByName(
+            "Test Hotlist"
+          );
+          if (
+            hotlistCollection &&
+            hotlistCollection.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Hotlist collection operations working");
+          } else {
+            results.push("❌ Hotlist collection operations failed");
+          }
+
+          // Test 5: Test cleanup operations
+          results.push("🧪 Test 5: Testing cleanup operations...");
+          await firebaseService.deleteFPSData(fpsDataId);
+
+          // Verify cleanup
+          const deviceAfterCleanup = await firebaseService.getDeviceByOEM(
+            "TestBrand"
+          );
+          const packageAfterCleanup = await firebaseService.getPackageByName(
+            "com.test.demo"
+          );
+          const hotlistAfterCleanup = await firebaseService.getHotlistByName(
+            "Test Hotlist"
+          );
+
+          if (
+            !deviceAfterCleanup ||
+            !deviceAfterCleanup.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Device collection cleanup successful");
+          } else {
+            results.push("❌ Device collection cleanup failed");
+          }
+
+          if (
+            !packageAfterCleanup ||
+            !packageAfterCleanup.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Package name collection cleanup successful");
+          } else {
+            results.push("❌ Package name collection cleanup failed");
+          }
+
+          if (
+            !hotlistAfterCleanup ||
+            !hotlistAfterCleanup.fpsDataReferences.includes(fpsDataId)
+          ) {
+            results.push("✅ Hotlist collection cleanup successful");
+          } else {
+            results.push("❌ Hotlist collection cleanup failed");
+          }
+
+          results.push("🎉 All tests completed!");
+        } catch (error) {
+          results.push(`❌ Test failed with error: ${error.message}`);
+          console.error("Test error:", error);
+        }
+
+        resultsContainer.innerHTML = `
+                <div class="success">
+                    <h3>Test Results:</h3>
+                    ${results.map((result) => `<div>${result}</div>`).join("")}
+                </div>
+            `;
+      };
+
+      window.clearDisplay = function () {
+        document.getElementById("devicesContainer").innerHTML =
+          '<div class="loading">Click "Load All Collections" to view devices...</div>';
+        document.getElementById("packagesContainer").innerHTML =
+          '<div class="loading">Click "Load All Collections" to view packages...</div>';
+        document.getElementById("hotlistsContainer").innerHTML =
+          '<div class="loading">Click "Load All Collections" to view hotlists...</div>';
+        document.getElementById("testResults").innerHTML = "";
+
+        // Reset stats
+        document.getElementById("totalFpsRecords").textContent = "-";
+        document.getElementById("totalDevices").textContent = "-";
+        document.getElementById("totalPackages").textContent = "-";
+        document.getElementById("totalHotlists").textContent = "-";
+      };
+
+      function showLoading() {
+        document.getElementById("devicesContainer").innerHTML =
+          '<div class="loading">Loading devices...</div>';
+        document.getElementById("packagesContainer").innerHTML =
+          '<div class="loading">Loading packages...</div>';
+        document.getElementById("hotlistsContainer").innerHTML =
+          '<div class="loading">Loading hotlists...</div>';
+      }
+
+      function showError(message) {
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "error";
+        errorDiv.textContent = message;
+        document.body.insertBefore(errorDiv, document.body.firstChild);
+        setTimeout(() => errorDiv.remove(), 5000);
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.createElement("div");
+        successDiv.className = "success";
+        successDiv.textContent = message;
+        document.body.insertBefore(successDiv, document.body.firstChild);
+        setTimeout(() => successDiv.remove(), 3000);
+      }
+
+      // Initialize Firebase connection status
+      if (firebaseService.isConnected()) {
+        console.log("Firebase service is connected and ready");
+      } else {
+        showError("Firebase service is not connected");
+      }
+    </script>
+  </body>
+</html>

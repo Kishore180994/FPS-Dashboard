@@ -11,6 +11,8 @@ import {
 import { initializeSidebar } from "./sidebar.js";
 import * as HotlistManager from "./hotlist-manager.js";
 import { initializeEnhancedHotlistUI } from "./hotlist-ui-redesign.js";
+import { initializeChatbotService } from "./chatbot-service.js";
+import { initializeChatbotUI } from "./chatbot-ui.js";
 
 // A global variable to hold the main dashboard instance.
 let dashboard;
@@ -41,6 +43,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize enhanced hotlist UI
   initializeEnhancedHotlistUI();
+
+  // Initialize chatbot
+  const chatbotService = initializeChatbotService(dashboard);
+  const chatbotUI = initializeChatbotUI();
+
+  // Make chatbot UI globally accessible
+  window.chatbotUI = chatbotUI;
+
+  // Expose chatbot functions globally
+  window.sendQuickMessage = (message) => {
+    if (window.chatbotUI) {
+      window.chatbotUI.inputField.value = message;
+      window.chatbotUI.updateSendButton();
+      window.chatbotUI.inputField.focus();
+    }
+  };
 
   // 4. Expose certain UI or utility functions globally if they are called directly
   //    from inline HTML handlers and are not methods of the dashboard object.

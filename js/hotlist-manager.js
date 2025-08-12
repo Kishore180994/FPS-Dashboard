@@ -1,18 +1,41 @@
 // Hotlist Management Module - Handles hotlist creation, assignment, and filtering
 
+import { firebaseService } from "./firebase-service.js";
+
 // Hotlist storage and state
 let hotlists = [];
 let currentHotlistFilter = null;
 
-// Initialize hotlists from localStorage
-export function initializeHotlists() {
-  const savedHotlists = localStorage.getItem("fps-dashboard-hotlists");
-  if (savedHotlists) {
-    try {
-      hotlists = JSON.parse(savedHotlists);
-    } catch (error) {
-      console.error("Error loading hotlists from localStorage:", error);
-      hotlists = [];
+// Initialize hotlists from Firebase and localStorage (fallback)
+export async function initializeHotlists() {
+  try {
+    // Try to load from Firebase first
+    if (firebaseService.isConnected()) {
+      hotlists = await firebaseService.loadAllHotlists();
+      console.log(`Loaded ${hotlists.length} hotlists from Firebase`);
+    } else {
+      // Fallback to localStorage
+      const savedHotlists = localStorage.getItem("fps-dashboard-hotlists");
+      if (savedHotlists) {
+        try {
+          hotlists = JSON.parse(savedHotlists);
+        } catch (error) {
+          console.error("Error loading hotlists from localStorage:", error);
+          hotlists = [];
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error initializing hotlists:", error);
+    // Fallback to localStorage
+    const savedHotlists = localStorage.getItem("fps-dashboard-hotlists");
+    if (savedHotlists) {
+      try {
+        hotlists = JSON.parse(savedHotlists);
+      } catch (error) {
+        console.error("Error loading hotlists from localStorage:", error);
+        hotlists = [];
+      }
     }
   }
 }
@@ -34,7 +57,7 @@ function generateHotlistId() {
 }
 
 // Create a new hotlist
-export function createHotlist(name, description) {
+export async function createHotlist(name, description) {
   if (!name || name.trim() === "") {
     throw new Error("Hotlist name is required");
   }
@@ -55,8 +78,21 @@ export function createHotlist(name, description) {
     runIds: [], // Array of run indices that belong to this hotlist
   };
 
+  // Save to Firebase first if connected
+  if (firebaseService.isConnected()) {
+    try {
+      const firebaseId = await firebaseService.createHotlist(hotlist);
+      hotlist.firebaseId = firebaseId; // Store Firebase document ID
+      console.log(`Hotlist created in Firebase with ID: ${firebaseId}`);
+    } catch (error) {
+      console.error("Error creating hotlist in Firebase:", error);
+      // Continue with local storage even if Firebase fails
+    }
+  }
+
   hotlists.push(hotlist);
   saveHotlists();
+
   return hotlist;
 }
 
@@ -71,7 +107,7 @@ export function getHotlistById(id) {
 }
 
 // Update hotlist
-export function updateHotlist(id, updates) {
+export async function updateHotlist(id, updates) {
   const hotlistIndex = hotlists.findIndex((h) => h.id === id);
   if (hotlistIndex === -1) {
     throw new Error("Hotlist not found");
@@ -92,21 +128,46 @@ export function updateHotlist(id, updates) {
     }
   }
 
-  hotlists[hotlistIndex] = {
+  const updatedHotlist = {
     ...hotlists[hotlistIndex],
     ...updates,
     updatedAt: new Date().toISOString(),
   };
 
+  // Update in Firebase if connected and has Firebase ID
+  if (firebaseService.isConnected() && updatedHotlist.firebaseId) {
+    try {
+      await firebaseService.updateHotlist(updatedHotlist.firebaseId, updates);
+      console.log(`Hotlist updated in Firebase: ${updatedHotlist.firebaseId}`);
+    } catch (error) {
+      console.error("Error updating hotlist in Firebase:", error);
+      // Continue with local update even if Firebase fails
+    }
+  }
+
+  hotlists[hotlistIndex] = updatedHotlist;
   saveHotlists();
   return hotlists[hotlistIndex];
 }
 
 // Delete hotlist
-export function deleteHotlist(id) {
+export async function deleteHotlist(id) {
   const hotlistIndex = hotlists.findIndex((h) => h.id === id);
   if (hotlistIndex === -1) {
     throw new Error("Hotlist not found");
+  }
+
+  const hotlist = hotlists[hotlistIndex];
+
+  // Delete from Firebase if connected and has Firebase ID
+  if (firebaseService.isConnected() && hotlist.firebaseId) {
+    try {
+      await firebaseService.deleteHotlist(hotlist.firebaseId);
+      console.log(`Hotlist deleted from Firebase: ${hotlist.firebaseId}`);
+    } catch (error) {
+      console.error("Error deleting hotlist from Firebase:", error);
+      // Continue with local deletion even if Firebase fails
+    }
   }
 
   hotlists.splice(hotlistIndex, 1);
@@ -114,8 +175,13 @@ export function deleteHotlist(id) {
   return true;
 }
 
-// Add run to hotlist
-export function addRunToHotlist(hotlistId, runIndex) {
+// Add run to hotlist (with Firebase integration)
+export async function addRunToHotlist(
+  hotlistId,
+  runIndex,
+  fpsDataId = null,
+  runData = null
+) {
   const hotlist = getHotlistById(hotlistId);
   if (!hotlist) {
     throw new Error("Hotlist not found");
@@ -124,12 +190,48 @@ export function addRunToHotlist(hotlistId, runIndex) {
   if (!hotlist.runIds.includes(runIndex)) {
     hotlist.runIds.push(runIndex);
     saveHotlists();
+
+    // Also update Firebase hotlist collection
+    if (firebaseService.isConnected()) {
+      try {
+        // If fpsDataId is provided, use it directly
+        if (fpsDataId) {
+          await firebaseService.addToHotlistCollection(hotlist.name, fpsDataId);
+          console.log(
+            `Added FPS data ${fpsDataId} to Firebase hotlist: ${hotlist.name}`
+          );
+        }
+        // If runData is provided and has an id, use that
+        else if (runData && runData.id) {
+          await firebaseService.addToHotlistCollection(
+            hotlist.name,
+            runData.id
+          );
+          console.log(
+            `Added FPS data ${runData.id} to Firebase hotlist: ${hotlist.name}`
+          );
+        }
+        // Otherwise, just create/update the hotlist structure without the specific reference
+        else {
+          console.warn(
+            `No Firebase ID available for run ${runIndex}, hotlist updated locally only`
+          );
+        }
+      } catch (error) {
+        console.error("Error updating Firebase hotlist collection:", error);
+      }
+    }
   }
   return hotlist;
 }
 
-// Remove run from hotlist
-export function removeRunFromHotlist(hotlistId, runIndex) {
+// Remove run from hotlist (with Firebase integration)
+export async function removeRunFromHotlist(
+  hotlistId,
+  runIndex,
+  fpsDataId = null,
+  runData = null
+) {
   const hotlist = getHotlistById(hotlistId);
   if (!hotlist) {
     throw new Error("Hotlist not found");
@@ -139,6 +241,40 @@ export function removeRunFromHotlist(hotlistId, runIndex) {
   if (index > -1) {
     hotlist.runIds.splice(index, 1);
     saveHotlists();
+
+    // Also update Firebase hotlist collection
+    if (firebaseService.isConnected()) {
+      try {
+        // If fpsDataId is provided, use it directly
+        if (fpsDataId) {
+          await firebaseService.removeFromHotlistCollection(
+            hotlist.name,
+            fpsDataId
+          );
+          console.log(
+            `Removed FPS data ${fpsDataId} from Firebase hotlist: ${hotlist.name}`
+          );
+        }
+        // If runData is provided and has an id, use that
+        else if (runData && runData.id) {
+          await firebaseService.removeFromHotlistCollection(
+            hotlist.name,
+            runData.id
+          );
+          console.log(
+            `Removed FPS data ${runData.id} from Firebase hotlist: ${hotlist.name}`
+          );
+        }
+        // Otherwise, just update locally
+        else {
+          console.warn(
+            `No Firebase ID available for run ${runIndex}, hotlist updated locally only`
+          );
+        }
+      } catch (error) {
+        console.error("Error updating Firebase hotlist collection:", error);
+      }
+    }
   }
   return hotlist;
 }
@@ -157,7 +293,9 @@ export function getRunsForHotlist(hotlistId, allRuns) {
 
 // Get hotlists for a specific run
 export function getHotlistsForRun(runIndex) {
-  return hotlists.filter((hotlist) => hotlist.runIds.includes(runIndex));
+  return hotlists.filter(
+    (hotlist) => hotlist.runIds && hotlist.runIds.includes(runIndex)
+  );
 }
 
 // Set current hotlist filter
@@ -235,4 +373,58 @@ export function importHotlists(data) {
   hotlists = data.hotlists;
   saveHotlists();
   return hotlists;
+}
+
+// Synchronize hotlist references with local data after loading from Firebase
+export function synchronizeHotlistReferences(firebaseDataIds) {
+  if (!firebaseDataIds || firebaseDataIds.size === 0) {
+    console.log(
+      "No Firebase data mapping available for hotlist synchronization"
+    );
+    return;
+  }
+
+  // Create reverse mapping: Firebase document ID → local array index
+  const firebaseIdToLocalIndex = new Map();
+  for (const [localIndex, firebaseId] of firebaseDataIds.entries()) {
+    firebaseIdToLocalIndex.set(firebaseId, localIndex);
+  }
+
+  let updatedCount = 0;
+
+  // Update each hotlist's runIds to use local indices instead of Firebase IDs
+  hotlists.forEach((hotlist) => {
+    if (hotlist.runIds && Array.isArray(hotlist.runIds)) {
+      const originalRunIds = [...hotlist.runIds];
+      const newRunIds = [];
+
+      for (const runId of originalRunIds) {
+        // If runId is a Firebase document ID, convert it to local index
+        if (typeof runId === "string" && firebaseIdToLocalIndex.has(runId)) {
+          const localIndex = firebaseIdToLocalIndex.get(runId);
+          newRunIds.push(localIndex);
+          updatedCount++;
+        }
+        // If runId is already a local index (number), keep it
+        else if (typeof runId === "number") {
+          newRunIds.push(runId);
+        }
+        // Skip invalid references
+        else {
+          console.warn(
+            `Invalid run reference in hotlist ${hotlist.name}: ${runId}`
+          );
+        }
+      }
+
+      hotlist.runIds = newRunIds;
+    }
+  });
+
+  if (updatedCount > 0) {
+    console.log(
+      `Synchronized ${updatedCount} hotlist references from Firebase IDs to local indices`
+    );
+    saveHotlists();
+  }
 }

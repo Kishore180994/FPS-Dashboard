@@ -1038,17 +1038,17 @@ function saveEditHotlist(hotlistId) {
   }
 }
 
-function deleteHotlistConfirm(hotlistId) {
+async function deleteHotlistConfirm(hotlistId) {
   const hotlist = HotlistManager.getHotlistById(hotlistId);
   if (!hotlist) return;
 
   if (
     confirm(
-      `Are you sure you want to delete the hotlist "${hotlist.name}"? This action cannot be undone.`
+      `Are you sure you want to delete "${hotlist.name}"? This action cannot be undone.`
     )
   ) {
     try {
-      HotlistManager.deleteHotlist(hotlistId);
+      await HotlistManager.deleteHotlist(hotlistId);
       showToast(`Hotlist "${hotlist.name}" deleted successfully`, "success");
       updateHotlistView();
     } catch (error) {

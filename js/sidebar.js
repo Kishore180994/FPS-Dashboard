@@ -32,6 +32,11 @@ const headerConfig = {
     title: "Hotlists",
     description: "Manage and filter by hotlists",
   },
+  chatbot: {
+    icon: "🤖",
+    title: "AI Chatbot",
+    description: "Analyze performance with AI",
+  },
   firebase: {
     icon: "🔥",
     title: "Firebase",
@@ -150,10 +155,24 @@ function handleNavigation(view) {
   const analysisSection = document.querySelector(".analysis-section");
   const chartsSection = document.getElementById("chartsSection");
 
-  // Hide dedicated view sections
+  // Hide ALL dedicated view sections
   document.getElementById("allGamesSection").style.display = "none";
   document.getElementById("allDevicesSection").style.display = "none";
   document.getElementById("appChartsSection").style.display = "none";
+  document.getElementById("hotlistsSection").style.display = "none";
+  document.getElementById("chatbotSection").style.display = "none";
+  document.getElementById("firebaseSection").style.display = "none";
+
+  // Remove all view classes from main content to prevent stacking
+  const mainContent = document.getElementById("mainContent");
+  mainContent.classList.remove(
+    "games-view",
+    "devices-view",
+    "charts-view",
+    "hotlists-view",
+    "chatbot-view",
+    "firebase-view"
+  );
 
   // Show the relevant section based on the selected view
   switch (view) {
@@ -209,6 +228,16 @@ function handleNavigation(view) {
       break;
     case "hotlists":
       showHotlistsView(
+        uploadSection,
+        statsSection,
+        performanceSection,
+        analysisSection,
+        chartsSection,
+        dashboard
+      );
+      break;
+    case "chatbot":
+      showChatbotView(
         uploadSection,
         statsSection,
         performanceSection,
@@ -438,6 +467,43 @@ function showHotlistsView(
   dashboard.showToast("Switched to Hotlists view", "info");
 }
 
+function showChatbotView(
+  uploadSection,
+  statsSection,
+  performanceSection,
+  analysisSection,
+  chartsSection,
+  dashboard
+) {
+  // Hide all original dashboard sections
+  if (uploadSection) uploadSection.style.display = "none";
+  if (statsSection) statsSection.style.display = "none";
+  if (performanceSection) performanceSection.style.display = "none";
+  if (analysisSection) analysisSection.style.display = "none";
+  if (chartsSection) chartsSection.style.display = "none";
+  document.getElementById("currentViewSection").style.display = "none";
+
+  // Hide other dedicated view sections
+  document.getElementById("allGamesSection").style.display = "none";
+  document.getElementById("allDevicesSection").style.display = "none";
+  document.getElementById("appChartsSection").style.display = "none";
+  document.getElementById("hotlistsSection").style.display = "none";
+  document.getElementById("firebaseSection").style.display = "none";
+
+  // Show the dedicated chatbot section
+  const chatbotSection = document.getElementById("chatbotSection");
+  if (chatbotSection) {
+    chatbotSection.style.display = "block";
+
+    // Activate chatbot UI
+    if (window.chatbotUI) {
+      window.chatbotUI.activate();
+    }
+  }
+
+  dashboard.showToast("Switched to AI Chatbot view", "info");
+}
+
 function showFirebaseView(
   uploadSection,
   statsSection,
@@ -459,6 +525,7 @@ function showFirebaseView(
   document.getElementById("allDevicesSection").style.display = "none";
   document.getElementById("appChartsSection").style.display = "none";
   document.getElementById("hotlistsSection").style.display = "none";
+  document.getElementById("chatbotSection").style.display = "none";
 
   // Show the dedicated Firebase section
   const firebaseSection = document.getElementById("firebaseSection");

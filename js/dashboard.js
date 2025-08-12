@@ -110,18 +110,22 @@ export class FPSDashboard {
     const files = Array.from(fileInput.files);
     let successCount = 0;
     let errorCount = 0;
+    const uploadedFiles = []; // Track successfully uploaded files with their Firebase IDs
 
     try {
       this.showLoading();
 
-      // Prompt user for app names for each file
-      const fileAppNames = await UIManager.promptForAppNames(files);
-      if (!fileAppNames) {
+      // Prompt user for app names and hotlist selection for each file
+      const result = await UIManager.promptForAppNames(files);
+      if (!result) {
         // User cancelled
         this.hideLoading();
         return;
       }
 
+      const { appNames: fileAppNames, selectedHotlists } = result;
+
+      // Step 1: Upload all files to Firebase first
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const userProvidedAppName = fileAppNames[i];
@@ -136,13 +140,29 @@ export class FPSDashboard {
           );
 
           if (parsedData) {
+            // Add hotlist references directly to the parsed data
+            if (selectedHotlists && selectedHotlists.length > 0) {
+              parsedData.hotlistIds = [...selectedHotlists];
+            }
+
             const dataIndex = this.uploadedData.length;
             this.uploadedData.push(parsedData);
 
-            // Auto-save to Firebase if enabled
+            // Always save to Firebase to get the document ID
+            let firebaseDocumentId = null;
             if (this.autoSaveToFirebase) {
-              await this.saveDataToFirebase(parsedData, dataIndex);
+              firebaseDocumentId = await this.saveDataToFirebase(
+                parsedData,
+                dataIndex
+              );
             }
+
+            // Track the uploaded file with its Firebase ID
+            uploadedFiles.push({
+              dataIndex,
+              firebaseDocumentId,
+              parsedData,
+            });
 
             successCount++;
           } else {
@@ -154,23 +174,59 @@ export class FPSDashboard {
         }
       }
 
+      // Step 2: Assign successfully uploaded files to selected hotlists
+      if (
+        selectedHotlists &&
+        selectedHotlists.length > 0 &&
+        uploadedFiles.length > 0
+      ) {
+        for (const uploadedFile of uploadedFiles) {
+          const { dataIndex, firebaseDocumentId, parsedData } = uploadedFile;
+
+          for (const hotlistId of selectedHotlists) {
+            try {
+              // Use the Firebase document ID for hotlist assignment
+              await this.addRunToHotlist(
+                hotlistId,
+                dataIndex,
+                firebaseDocumentId,
+                parsedData
+              );
+            } catch (hotlistError) {
+              console.error(
+                `Error adding to hotlist ${hotlistId}:`,
+                hotlistError
+              );
+              // Don't fail the entire upload for hotlist errors
+            }
+          }
+        }
+      }
+
       this.updateDisplay();
 
-      // Show summary toast
+      // Show summary toast with hotlist information
+      let message = "";
       if (successCount > 0 && errorCount === 0) {
-        this.showToast(
-          `Successfully processed ${successCount} file${
-            successCount > 1 ? "s" : ""
-          }!`,
-          "success"
-        );
+        message = `Successfully processed ${successCount} file${
+          successCount > 1 ? "s" : ""
+        }!`;
+        if (selectedHotlists && selectedHotlists.length > 0) {
+          message += ` Added to ${selectedHotlists.length} hotlist${
+            selectedHotlists.length > 1 ? "s" : ""
+          }.`;
+        }
+        this.showToast(message, "success");
       } else if (successCount > 0 && errorCount > 0) {
-        this.showToast(
-          `Processed ${successCount} file${
-            successCount > 1 ? "s" : ""
-          }, ${errorCount} failed.`,
-          "warning"
-        );
+        message = `Processed ${successCount} file${
+          successCount > 1 ? "s" : ""
+        }, ${errorCount} failed.`;
+        if (selectedHotlists && selectedHotlists.length > 0) {
+          message += ` Successfully processed files added to ${
+            selectedHotlists.length
+          } hotlist${selectedHotlists.length > 1 ? "s" : ""}.`;
+        }
+        this.showToast(message, "warning");
       } else {
         this.showToast(
           `Failed to process ${errorCount} file${
@@ -440,29 +496,7 @@ export class FPSDashboard {
         return;
       }
 
-      // Delete from Firebase first
-      await this.deleteDataFromFirebase(dataIndex);
-
-      this.uploadedData.splice(dataIndex, 1);
-      this.selectedForComparison.delete(dataIndex);
-
-      const updatedSelection = new Set();
-      for (const index of this.selectedForComparison) {
-        if (index > dataIndex) {
-          updatedSelection.add(index - 1);
-        } else if (index < dataIndex) {
-          updatedSelection.add(index);
-        }
-      }
-      this.selectedForComparison = updatedSelection;
-
-      this.updateDisplay();
-      UIManager.updateViewControls(this);
-      UIManager.updateCompareControls(this);
-
-      if (window.currentAnalysisData === data) {
-        UIManager.closeAnalysisModal();
-      }
+      await this.deleteAnalysisResultInternal(dataIndex);
 
       this.showToast(
         `Analysis result for "${data.appName || "Unknown App"}" deleted.`,
@@ -471,6 +505,37 @@ export class FPSDashboard {
     } catch (error) {
       console.error("Error deleting analysis result:", error);
       this.showToast("Failed to delete analysis result.", "error");
+    }
+  }
+
+  async deleteAnalysisResultInternal(dataIndex) {
+    const data = this.uploadedData[dataIndex];
+    if (!data) {
+      throw new Error("Analysis result not found.");
+    }
+
+    // Delete from Firebase first
+    await this.deleteDataFromFirebase(dataIndex);
+
+    this.uploadedData.splice(dataIndex, 1);
+    this.selectedForComparison.delete(dataIndex);
+
+    const updatedSelection = new Set();
+    for (const index of this.selectedForComparison) {
+      if (index > dataIndex) {
+        updatedSelection.add(index - 1);
+      } else if (index < dataIndex) {
+        updatedSelection.add(index);
+      }
+    }
+    this.selectedForComparison = updatedSelection;
+
+    this.updateDisplay();
+    UIManager.updateViewControls(this);
+    UIManager.updateCompareControls(this);
+
+    if (window.currentAnalysisData === data) {
+      UIManager.closeAnalysisModal();
     }
   }
 
@@ -541,9 +606,9 @@ export class FPSDashboard {
   }
 
   // Hotlist methods
-  createHotlist(name, description) {
+  async createHotlist(name, description) {
     try {
-      const hotlist = HotlistManager.createHotlist(name, description);
+      const hotlist = await HotlistManager.createHotlist(name, description);
       this.showToast(`Hotlist "${name}" created successfully!`, "success");
       UIManager.updateHotlistsView(this);
       return hotlist;
@@ -553,9 +618,9 @@ export class FPSDashboard {
     }
   }
 
-  deleteHotlist(hotlistId) {
+  async deleteHotlist(hotlistId) {
     try {
-      HotlistManager.deleteHotlist(hotlistId);
+      await HotlistManager.deleteHotlist(hotlistId);
       this.showToast("Hotlist deleted successfully!", "success");
       UIManager.updateHotlistsView(this);
 
@@ -568,9 +633,48 @@ export class FPSDashboard {
     }
   }
 
-  addRunToHotlist(hotlistId, runIndex) {
+  async addRunToHotlist(
+    hotlistId,
+    runIndex,
+    firebaseDocumentId = null,
+    parsedData = null
+  ) {
     try {
-      HotlistManager.addRunToHotlist(hotlistId, runIndex);
+      // Get the Firebase document ID for this run
+      const fpsDataId =
+        firebaseDocumentId || this.firebaseDataIds.get(runIndex);
+      const runData = parsedData || this.uploadedData[runIndex];
+
+      // Add to hotlist manager
+      await HotlistManager.addRunToHotlist(
+        hotlistId,
+        runIndex,
+        fpsDataId,
+        runData
+      );
+
+      // Also store hotlist reference in the FPS data itself
+      if (runData && !runData.hotlistIds) {
+        runData.hotlistIds = [];
+      }
+      if (runData && !runData.hotlistIds.includes(hotlistId)) {
+        runData.hotlistIds.push(hotlistId);
+
+        // Update in Firebase if available
+        if (fpsDataId) {
+          try {
+            await this.updateDataInFirebase(runIndex, {
+              hotlistIds: runData.hotlistIds,
+            });
+          } catch (firebaseError) {
+            console.warn(
+              "Failed to update hotlist reference in Firebase:",
+              firebaseError
+            );
+          }
+        }
+      }
+
       this.showToast("Run added to hotlist!", "success");
       UIManager.updateHotlistsView(this);
     } catch (error) {
@@ -578,9 +682,41 @@ export class FPSDashboard {
     }
   }
 
-  removeRunFromHotlist(hotlistId, runIndex) {
+  async removeRunFromHotlist(hotlistId, runIndex) {
     try {
-      HotlistManager.removeRunFromHotlist(hotlistId, runIndex);
+      // Get the Firebase document ID for this run
+      const fpsDataId = this.firebaseDataIds.get(runIndex);
+      const runData = this.uploadedData[runIndex];
+
+      await HotlistManager.removeRunFromHotlist(
+        hotlistId,
+        runIndex,
+        fpsDataId,
+        runData
+      );
+
+      // Also remove hotlist reference from the FPS data itself
+      if (runData && runData.hotlistIds) {
+        const index = runData.hotlistIds.indexOf(hotlistId);
+        if (index > -1) {
+          runData.hotlistIds.splice(index, 1);
+
+          // Update in Firebase if available
+          if (fpsDataId) {
+            try {
+              await this.updateDataInFirebase(runIndex, {
+                hotlistIds: runData.hotlistIds,
+              });
+            } catch (firebaseError) {
+              console.warn(
+                "Failed to update hotlist reference in Firebase:",
+                firebaseError
+              );
+            }
+          }
+        }
+      }
+
       this.showToast("Run removed from hotlist!", "success");
       UIManager.updateHotlistsView(this);
     } catch (error) {
@@ -664,17 +800,20 @@ export class FPSDashboard {
    * Save FPS data to Firebase
    * @param {Object} fpsData - The FPS data to save
    * @param {number} localIndex - Local array index for mapping
+   * @returns {Promise<string|null>} Firebase document ID or null if failed
    */
   async saveDataToFirebase(fpsData, localIndex) {
-    if (!this.firebaseEnabled || !this.autoSaveToFirebase) return;
+    if (!this.firebaseEnabled || !this.autoSaveToFirebase) return null;
 
     try {
       const documentId = await firebaseService.saveFPSData(fpsData);
       this.firebaseDataIds.set(localIndex, documentId);
       console.log(`Data saved to Firebase with ID: ${documentId}`);
+      return documentId;
     } catch (error) {
       console.error("Error saving data to Firebase:", error);
       this.showToast("Failed to save data to Firebase", "warning");
+      return null;
     }
   }
 
@@ -709,16 +848,29 @@ export class FPSDashboard {
           this.firebaseDataIds.set(index, id);
         });
 
+        // Initialize hotlists and synchronize references after data is loaded
+        await HotlistManager.initializeHotlists();
+        HotlistManager.synchronizeHotlistReferences(this.firebaseDataIds);
+
         this.updateDisplay();
         this.showToast(
           `Loaded ${firebaseData.length} records from Firebase`,
           "success"
         );
         console.log(`Loaded ${firebaseData.length} records from Firebase`);
+      } else {
+        // Even if no FPS data, still initialize hotlists
+        await HotlistManager.initializeHotlists();
       }
     } catch (error) {
       console.error("Error loading data from Firebase:", error);
       this.showToast("Failed to load data from Firebase", "error");
+      // Still try to initialize hotlists even if FPS data loading fails
+      try {
+        await HotlistManager.initializeHotlists();
+      } catch (hotlistError) {
+        console.error("Error initializing hotlists:", hotlistError);
+      }
     } finally {
       this.hideLoading();
     }
